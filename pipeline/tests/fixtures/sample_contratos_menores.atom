@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:cbc="urn:dgpe:names:draft:codice:schema:xsd:CommonBasicComponents-2"
+      xmlns:cac="urn:dgpe:names:draft:codice:schema:xsd:CommonAggregateComponents-2"
+      xmlns:cac-place-ext="urn:dgpe:names:draft:codice-place-ext:schema:xsd:CommonAggregateComponents-2">
+  <title>Contratos menores - muestra sintética</title>
+  <updated>2021-03-16T00:00:00Z</updated>
+
+  <entry>
+    <id>https://contrataciondelestado.es/sindicacion/PlataformasAgregadasSinMenores/12345</id>
+    <title>Contrato menor de servicios de limpieza</title>
+    <updated>2021-03-15T10:00:00Z</updated>
+    <cac-place-ext:ContractFolderStatus>
+      <cbc:ContractFolderID>EXP-2021-0001</cbc:ContractFolderID>
+      <cbc:ContractFolderStatusCode>RES</cbc:ContractFolderStatusCode>
+      <cac-place-ext:LocatedContractingParty>
+        <cac:Party>
+          <cac:PartyIdentification><cbc:ID>P2807900B</cbc:ID></cac:PartyIdentification>
+          <cac:PartyName><cbc:Name>Ayuntamiento de Ejemplo</cbc:Name></cac:PartyName>
+        </cac:Party>
+      </cac-place-ext:LocatedContractingParty>
+      <cac:ProcurementProject>
+        <cbc:Name>Servicios de limpieza de dependencias municipales</cbc:Name>
+        <cbc:TypeCode>2</cbc:TypeCode>
+        <cac:BudgetAmount>
+          <cbc:TotalAmount currencyID="EUR">14500.00</cbc:TotalAmount>
+          <cbc:TaxExclusiveAmount currencyID="EUR">11983.47</cbc:TaxExclusiveAmount>
+        </cac:BudgetAmount>
+        <cac:RequiredCommodityClassification>
+          <cbc:ItemClassificationCode>90910000</cbc:ItemClassificationCode>
+        </cac:RequiredCommodityClassification>
+        <cac:RealizedLocation>
+          <cbc:CountrySubentityCode>ES300</cbc:CountrySubentityCode>
+        </cac:RealizedLocation>
+      </cac:ProcurementProject>
+      <cac-place-ext:TenderResult>
+        <cbc:AwardDate>2021-03-10</cbc:AwardDate>
+        <cac:WinningParty>
+          <cac:PartyIdentification><cbc:ID>B12345678</cbc:ID></cac:PartyIdentification>
+          <cac:PartyName><cbc:Name>Limpiezas Ejemplo S.L.</cbc:Name></cac:PartyName>
+        </cac:WinningParty>
+        <cac:AwardedTenderedProject>
+          <cac:LegalMonetaryTotal>
+            <cbc:PayableAmount currencyID="EUR">14350.00</cbc:PayableAmount>
+          </cac:LegalMonetaryTotal>
+        </cac:AwardedTenderedProject>
+      </cac-place-ext:TenderResult>
+    </cac-place-ext:ContractFolderStatus>
+  </entry>
+
+  <entry>
+    <id>https://contrataciondelestado.es/sindicacion/PlataformasAgregadasSinMenores/12346</id>
+    <title>Contrato menor de suministro de material de oficina</title>
+    <updated>2021-02-01T09:00:00Z</updated>
+    <cac-place-ext:ContractFolderStatus>
+      <cbc:ContractFolderID>EXP-2021-0002</cbc:ContractFolderID>
+      <cbc:ContractFolderStatusCode>EV</cbc:ContractFolderStatusCode>
+      <cac-place-ext:LocatedContractingParty>
+        <cac:Party>
+          <cac:PartyIdentification><cbc:ID>S2811001C</cbc:ID></cac:PartyIdentification>
+          <cac:PartyName><cbc:Name>Consejería de Ejemplo</cbc:Name></cac:PartyName>
+        </cac:Party>
+      </cac-place-ext:LocatedContractingParty>
+      <cac:ProcurementProject>
+        <cbc:Name>Suministro de material de oficina</cbc:Name>
+        <cbc:TypeCode>1</cbc:TypeCode>
+        <cac:BudgetAmount>
+          <cbc:TotalAmount currencyID="EUR">5000.00</cbc:TotalAmount>
+        </cac:BudgetAmount>
+        <cac:RequiredCommodityClassification>
+          <cbc:ItemClassificationCode>30190000</cbc:ItemClassificationCode>
+        </cac:RequiredCommodityClassification>
+        <cac:RealizedLocation>
+          <cbc:CountrySubentityCode>ES300</cbc:CountrySubentityCode>
+        </cac:RealizedLocation>
+      </cac:ProcurementProject>
+      <!-- Aún sin adjudicar: sin TenderResult, los campos de adjudicación quedan nulos. -->
+    </cac-place-ext:ContractFolderStatus>
+  </entry>
+</feed>

@@ -1,0 +1,126 @@
+{
+  "descripcion": "Partido que presidia cada comunidad autonoma y ciudad autonoma de Espana, ano a ano",
+  "criterio": "Partido del presidente en ejercicio a 31 de diciembre de cada ano. En anos con elecciones y cambio de gobierno a mitad de ano, el ano se asigna al partido entrante.",
+  "periodo": { "inicio": 2012, "fin": 2026 },
+  "fuente": "Reconstruido a partir del registro historico de presidentes autonomicos. La tabla original aportada solo contenia los anos de toma de posesion del presidente actual, no el historico completo.",
+  "partidos": {
+    "PP": "Partido Popular",
+    "PSOE": "Partido Socialista Obrero Espanol",
+    "PSC": "Partit dels Socialistes de Catalunya",
+    "CC": "Coalicion Canaria",
+    "ERC": "Esquerra Republicana de Catalunya",
+    "PRC": "Partido Regionalista de Cantabria",
+    "PNV": "Eusko Alderdi Jeltzalea - Partido Nacionalista Vasco (EAJ-PNV)",
+    "JxCat": "Junts per Catalunya / CDC-PDeCAT (linea convergente: Puigdemont y Torra)",
+    "CiU": "Convergencia i Unio (Artur Mas)",
+    "UPN": "Union del Pueblo Navarro",
+    "GeroaBai": "Geroa Bai",
+    "Cs": "Ciudadanos",
+    "155": "Gobierno central (intervencion por el articulo 155)"
+  },
+  "notas": [
+    "Melilla 2019-2023: Eduardo de Castro fue investido como candidato de Ciudadanos, gobernando en coalicion con PSOE y Coalicion por Melilla. Fue expulsado de Cs en 2021 y continuo como independiente. Se codifica como 'Cs'; no fue un gobierno del PP.",
+    "Cataluna 2017: a 31 de diciembre el Govern estaba intervenido por el Estado (articulo 155), por lo que se codifica como '155'.",
+    "Asturias: a comienzos de 2012 goberno Foro Asturias (Alvarez-Cascos) hasta las elecciones anticipadas de marzo; a 31/12/2012 ya gobernaba el PSOE.",
+    "Pais Vasco: hasta diciembre de 2012 el lendakari fue Patxi Lopez (PSE-EE, socialistas vascos); a 31/12/2012 ya gobernaba el PNV (Urkullu).",
+    "El PSC se contabiliza aparte del PSOE por ser un partido catalan diferenciado.",
+    "Ano 2026: refleja el gobierno vigente a comienzos de 2026. En el ciclo autonomico comun las proximas elecciones se celebran en 2027."
+  ],
+  "comunidades": [
+    {
+      "nombre": "Andalucia",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PSOE", "2013": "PSOE", "2014": "PSOE", "2015": "PSOE", "2016": "PSOE", "2017": "PSOE", "2018": "PSOE", "2019": "PP", "2020": "PP", "2021": "PP", "2022": "PP", "2023": "PP", "2024": "PP", "2025": "PP", "2026": "PP" }
+    },
+    {
+      "nombre": "Aragon",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PP", "2013": "PP", "2014": "PP", "2015": "PSOE", "2016": "PSOE", "2017": "PSOE", "2018": "PSOE", "2019": "PSOE", "2020": "PSOE", "2021": "PSOE", "2022": "PSOE", "2023": "PP", "2024": "PP", "2025": "PP", "2026": "PP" }
+    },
+    {
+      "nombre": "Principado de Asturias",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PSOE", "2013": "PSOE", "2014": "PSOE", "2015": "PSOE", "2016": "PSOE", "2017": "PSOE", "2018": "PSOE", "2019": "PSOE", "2020": "PSOE", "2021": "PSOE", "2022": "PSOE", "2023": "PSOE", "2024": "PSOE", "2025": "PSOE", "2026": "PSOE" }
+    },
+    {
+      "nombre": "Islas Baleares",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PP", "2013": "PP", "2014": "PP", "2015": "PSOE", "2016": "PSOE", "2017": "PSOE", "2018": "PSOE", "2019": "PSOE", "2020": "PSOE", "2021": "PSOE", "2022": "PSOE", "2023": "PP", "2024": "PP", "2025": "PP", "2026": "PP" }
+    },
+    {
+      "nombre": "Canarias",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "CC", "2013": "CC", "2014": "CC", "2015": "CC", "2016": "CC", "2017": "CC", "2018": "CC", "2019": "PSOE", "2020": "PSOE", "2021": "PSOE", "2022": "PSOE", "2023": "CC", "2024": "CC", "2025": "CC", "2026": "CC" }
+    },
+    {
+      "nombre": "Cantabria",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PP", "2013": "PP", "2014": "PP", "2015": "PRC", "2016": "PRC", "2017": "PRC", "2018": "PRC", "2019": "PRC", "2020": "PRC", "2021": "PRC", "2022": "PRC", "2023": "PP", "2024": "PP", "2025": "PP", "2026": "PP" }
+    },
+    {
+      "nombre": "Castilla-La Mancha",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PP", "2013": "PP", "2014": "PP", "2015": "PSOE", "2016": "PSOE", "2017": "PSOE", "2018": "PSOE", "2019": "PSOE", "2020": "PSOE", "2021": "PSOE", "2022": "PSOE", "2023": "PSOE", "2024": "PSOE", "2025": "PSOE", "2026": "PSOE" }
+    },
+    {
+      "nombre": "Castilla y Leon",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PP", "2013": "PP", "2014": "PP", "2015": "PP", "2016": "PP", "2017": "PP", "2018": "PP", "2019": "PP", "2020": "PP", "2021": "PP", "2022": "PP", "2023": "PP", "2024": "PP", "2025": "PP", "2026": "PP" }
+    },
+    {
+      "nombre": "Cataluna",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "CiU", "2013": "CiU", "2014": "CiU", "2015": "CiU", "2016": "JxCat", "2017": "155", "2018": "JxCat", "2019": "JxCat", "2020": "ERC", "2021": "ERC", "2022": "ERC", "2023": "ERC", "2024": "PSC", "2025": "PSC", "2026": "PSC" }
+    },
+    {
+      "nombre": "Ceuta",
+      "tipo": "ciudad_autonoma",
+      "mandatos": { "2012": "PP", "2013": "PP", "2014": "PP", "2015": "PP", "2016": "PP", "2017": "PP", "2018": "PP", "2019": "PP", "2020": "PP", "2021": "PP", "2022": "PP", "2023": "PP", "2024": "PP", "2025": "PP", "2026": "PP" }
+    },
+    {
+      "nombre": "Extremadura",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PP", "2013": "PP", "2014": "PP", "2015": "PSOE", "2016": "PSOE", "2017": "PSOE", "2018": "PSOE", "2019": "PSOE", "2020": "PSOE", "2021": "PSOE", "2022": "PSOE", "2023": "PP", "2024": "PP", "2025": "PP", "2026": "PP" }
+    },
+    {
+      "nombre": "Galicia",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PP", "2013": "PP", "2014": "PP", "2015": "PP", "2016": "PP", "2017": "PP", "2018": "PP", "2019": "PP", "2020": "PP", "2021": "PP", "2022": "PP", "2023": "PP", "2024": "PP", "2025": "PP", "2026": "PP" }
+    },
+    {
+      "nombre": "La Rioja",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PP", "2013": "PP", "2014": "PP", "2015": "PP", "2016": "PP", "2017": "PP", "2018": "PP", "2019": "PSOE", "2020": "PSOE", "2021": "PSOE", "2022": "PSOE", "2023": "PP", "2024": "PP", "2025": "PP", "2026": "PP" }
+    },
+    {
+      "nombre": "Comunidad de Madrid",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PP", "2013": "PP", "2014": "PP", "2015": "PP", "2016": "PP", "2017": "PP", "2018": "PP", "2019": "PP", "2020": "PP", "2021": "PP", "2022": "PP", "2023": "PP", "2024": "PP", "2025": "PP", "2026": "PP" }
+    },
+    {
+      "nombre": "Melilla",
+      "tipo": "ciudad_autonoma",
+      "mandatos": { "2012": "PP", "2013": "PP", "2014": "PP", "2015": "PP", "2016": "PP", "2017": "PP", "2018": "PP", "2019": "Cs", "2020": "Cs", "2021": "Cs", "2022": "Cs", "2023": "PP", "2024": "PP", "2025": "PP", "2026": "PP" }
+    },
+    {
+      "nombre": "Region de Murcia",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PP", "2013": "PP", "2014": "PP", "2015": "PP", "2016": "PP", "2017": "PP", "2018": "PP", "2019": "PP", "2020": "PP", "2021": "PP", "2022": "PP", "2023": "PP", "2024": "PP", "2025": "PP", "2026": "PP" }
+    },
+    {
+      "nombre": "Comunidad Foral de Navarra",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "UPN", "2013": "UPN", "2014": "UPN", "2015": "GeroaBai", "2016": "GeroaBai", "2017": "GeroaBai", "2018": "GeroaBai", "2019": "PSOE", "2020": "PSOE", "2021": "PSOE", "2022": "PSOE", "2023": "PSOE", "2024": "PSOE", "2025": "PSOE", "2026": "PSOE" }
+    },
+    {
+      "nombre": "Comunidad Valenciana",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PP", "2013": "PP", "2014": "PP", "2015": "PSOE", "2016": "PSOE", "2017": "PSOE", "2018": "PSOE", "2019": "PSOE", "2020": "PSOE", "2021": "PSOE", "2022": "PSOE", "2023": "PP", "2024": "PP", "2025": "PP", "2026": "PP" }
+    },
+    {
+      "nombre": "Pais Vasco",
+      "tipo": "comunidad_autonoma",
+      "mandatos": { "2012": "PNV", "2013": "PNV", "2014": "PNV", "2015": "PNV", "2016": "PNV", "2017": "PNV", "2018": "PNV", "2019": "PNV", "2020": "PNV", "2021": "PNV", "2022": "PNV", "2023": "PNV", "2024": "PNV", "2025": "PNV", "2026": "PNV" }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "datos-contratos-publicos",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Plataforma de visualización y análisis de contratación pública en España (histórico 2012+). Local-first; publicación pública en Fase 4.",
+  "workspaces": [
+    "web",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace web",
+    "build": "npm run build --workspace web",
+    "preview": "npm run preview --workspace web",
+    "typecheck": "npm run typecheck --workspace web"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

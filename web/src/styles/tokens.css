@@ -1,0 +1,64 @@
+/* Design tokens — tema claro premium, tipografía 100% monoespaciada.
+   Escala de espaciado 4/8. El color se usa para significado, no para decorar. */
+
+:root {
+  /* Tipografía mono (varias familias/pesos, todas monospace) */
+  --font-sans: "JetBrains Mono", ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace;
+  --font-display: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
+
+  --fs-12: 0.75rem;
+  --fs-13: 0.8125rem;
+  --fs-14: 0.875rem;
+  --fs-16: 1rem;
+  --fs-20: 1.25rem;
+  --fs-28: 1.75rem;
+  --fs-40: 2.5rem;
+
+  /* Superficies (blanco cálido, no puro) */
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --surface-2: #f4f4f1;
+  --border: #e6e6e0;
+  --border-strong: #d4d4cc;
+
+  /* Tinta */
+  --ink: #0e0e0c;
+  --ink-2: #4a4a45;
+  --ink-3: #8a8a82;
+
+  /* Acento único + semánticos (uso parco) */
+  --accent: #1d4ed8;
+  --accent-soft: #e8edfb;
+  --warn: #b45309;
+  --warn-soft: #fbf1e3;
+
+  /* Escala secuencial accesible para mapas (azules, colorblind-safe) */
+  --seq-1: #eef3fb;
+  --seq-2: #c9d9f3;
+  --seq-3: #9bb9e8;
+  --seq-4: #6592d8;
+  --seq-5: #3568c4;
+  --seq-6: #1d4ed8;
+
+  /* Espaciado */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+
+  --shadow-sm: 0 1px 2px rgba(14, 14, 12, 0.04);
+  --shadow: 0 4px 16px rgba(14, 14, 12, 0.06);
+
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur: 200ms;
+
+  --rail-w: 264px;
+  --context-w: 300px;
+  --header-h: 60px;
+}

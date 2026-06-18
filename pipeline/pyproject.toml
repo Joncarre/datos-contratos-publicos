@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "contratos-pipeline"
+version = "0.1.0"
+description = "Pipeline de ingestión, normalización y agregación de contratación pública (ATOM/CODICE -> Parquet -> marts)."
+requires-python = ">=3.11"
+dependencies = [
+    "lxml>=5.0",
+    "pyarrow>=15.0",
+    "duckdb>=1.0",
+    "typer>=0.12",
+    "pyyaml>=6.0",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+contratos-pipeline = "contratos_pipeline.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["contratos_pipeline"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

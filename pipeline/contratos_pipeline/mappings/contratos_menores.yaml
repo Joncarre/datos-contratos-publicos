@@ -1,0 +1,30 @@
+# Mapeo versionado: fuente "contratos_menores" -> modelo canónico.
+#
+# Este fichero declara CÓMO se interpretan los campos del Bronze hacia el modelo canónico
+# (capa Silver, Fase 1). Permite absorber diferencias entre periodos SIN tocar el código:
+# cuando un campo cambie de nombre/formato en cierto año, se añade una regla por rango.
+#
+# Estructura prevista (se consolidará al ver muestras reales 2018 vs. reciente):
+
+source: contratos_menores
+coverage_from: 2018
+
+# Reglas por rango de años. La primera que aplique gana.
+periods:
+  - from: 2018
+    to: 9999
+    fields:
+      # canonico:        origen (campo del Bronze)        transform
+      objeto:            { from: objeto,             transform: trim }
+      organo_nombre:     { from: organo_nombre,      transform: trim }
+      organo_id:         { from: organo_id,          transform: nif }
+      adjudicatario_nombre: { from: adjudicatario_nombre, transform: trim }
+      adjudicatario_id:  { from: adjudicatario_id,   transform: nif_seudonimizar }
+      importe_adjudicacion: { from: importe_adjudicacion, transform: amount }
+      importe_licitacion:   { from: importe_licitacion,   transform: amount }
+      fecha_adjudicacion:   { from: fecha_adjudicacion,   transform: date_iso }
+      cpv:               { from: cpv,                transform: trim }
+      territorio_code:   { from: territorio_code,    transform: nuts_to_ine }
+
+# Transforms disponibles (implementación en normalize/, Fase 1):
+#   trim, amount, date_iso, nif, nif_seudonimizar, nuts_to_ine

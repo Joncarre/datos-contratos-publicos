@@ -1,0 +1,100 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# DATOS (NUNCA al repositorio: 137 GB de fuentes + datos procesados)
+# ─────────────────────────────────────────────────────────────────────────────
+# Ignora TODO dentro de data/ EXCEPTO la carpeta de referencia (datos pequeños y versionables)
+/data/*
+!/data/referencia/
+!/data/README.md
+# Por si alguien crea la carpeta con otro nombre o en subniveles:
+**/contratos_menores/
+**/placsp/
+**/_processed/
+**/_bronze/
+**/_silver/
+**/_gold/
+
+# Formatos de datos crudos y procesados (pesados)
+*.atom
+*.atom.zip
+*.xml
+*.zip
+*.gz
+*.7z
+*.tar
+*.parquet
+*.duckdb
+*.duckdb.wal
+*.db
+*.sqlite
+*.sqlite3
+# Excepción: permitir muestras pequeñas y datos de referencia versionables
+!data/referencia/**
+!**/samples/**
+!**/fixtures/**
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Node / Frontend (TS/React)
+# ─────────────────────────────────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+dist/
+build/
+.next/
+out/
+.vite/
+.turbo/
+.cache/
+coverage/
+.eslintcache
+*.tsbuildinfo
+# Marts publicados al frontend (se generan, no se versionan)
+web/public/data/
+web/public/marts/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Python / Pipeline
+# ─────────────────────────────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+*.egg-info/
+.python-version
+dist-python/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Entorno y secretos
+# ─────────────────────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.local
+secrets.*
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Logs / temporales
+# ─────────────────────────────────────────────────────────────────────────────
+logs/
+*.log
+tmp/
+.tmp/
+*.tmp
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Sistema operativo / IDE
+# ─────────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.shared.json
