@@ -4,6 +4,7 @@
 # Ignora TODO dentro de data/ EXCEPTO la carpeta de referencia (datos pequeños y versionables)
 /data/*
 !/data/referencia/
+!/data/partidos_politicos/
 !/data/README.md
 # Por si alguien crea la carpeta con otro nombre o en subniveles:
 **/contratos_menores/

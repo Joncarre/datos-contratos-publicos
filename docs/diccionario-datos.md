@@ -42,8 +42,28 @@ Un registro = un contrato/lote/procedimiento normalizado. **Todos los campos del
 | `coverage_flags` | JSON | Qué campos venían vacíos en origen |
 | `schema_version` | str | Versión del mapeo aplicado |
 
-## Estado actual (Bronze, Fase 0)
-El parser ya emite los campos `entry_id, title, updated, id_origen, estado, organo_nombre, organo_id, objeto, tipo_contrato, cpv, territorio_code, importe_licitacion, fecha_adjudicacion, adjudicatario_nombre, adjudicatario_id, importe_adjudicacion, payload_json` + metadatos. Las rutas de extracción (`FIELD_PATHS` en `atom_parser.py`) se **afinan contra muestras reales**.
+## Estado actual: Bronze real (Fase 1, validado contra datos reales)
+
+El parser emite **~35 columnas tipadas** (sin `payload_json`: los `.atom` en disco son la capa cruda inmutable, así que el Parquet es pequeño y eficiente). Esquema en `atom_parser.py:FIELD_TYPES`:
+
+| Grupo | Columnas |
+|---|---|
+| entry | `entry_id, link_detalle, title, updated, summary` |
+| digest `<summary>` | `sum_id, sum_organo, sum_importe, sum_estado` (cruce robusto) |
+| folder | `id_origen, estado` |
+| órgano | `organo_nombre, organo_nif, organo_dir3, organo_id_plataforma, organo_ciudad, organo_cp, poder_tipo, actividad, admin_hierarchy` |
+| objeto | `objeto, tipo_contrato, subtipo_contrato, importe_estimado, importe_sin_iva, importe_total_con_iva, cpv, territorio_nombre, territorio_code` |
+| adjudicación | `n_resultados, result_code, fecha_adjudicacion, adjudicatario_nombre, adjudicatario_nif, importe_adjudicado, importe_adjudicado_sin_iva` |
+| metadatos | `source, source_file, source_file_hash, ingested_at, year` |
+
+Notas de extracción aprendidas del esquema CODICE real:
+- **`PartyIdentification` repetido por `schemeName`** (DIR3/NIF/ID_PLATAFORMA): se elige el **NIF** para órgano y adjudicatario.
+- **`year`** se deriva de `updated` (timestamp de sindicación, fiable), no de `AwardDate` (puede venir malformado).
+- **`admin_hierarchy`** = cadena `ParentLocatedParty` (municipio › provincia › CCAA › nivel › Sector Público).
+- Puede haber **varios `TenderResult`** (uno por lote): se toma el primer adjudicatario y se **suma** el importe adjudicado.
+
+## Capa Gold (marts, `aggregate/marts.py`)
+`importe` = `COALESCE(importe_adjudicado, importe_total_con_iva, sum_importe, importe_sin_iva)`. `ccaa` se deriva del **NUTS** (`territorio_code`, ej. ES242→Aragón, ES300→Madrid, ES7→Canarias). Marts: `resumen, serie_anual, territorio, top_adjudicatarios, top_organos` → `web/public/data/*.json`.
 
 ## Deduplicación
 - **Exacta:** `(id_origen, organo_id)` o `(cpv, organo_id, adjudicatario_id, fecha, importe)`.

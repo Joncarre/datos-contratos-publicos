@@ -1,43 +1,75 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  CCAA_ABBR,
+  eur,
+  loadMarts,
+  num,
+  SOURCE_COVERAGE,
+  SOURCE_LABEL,
+  sumBy,
+  type Marts,
+  type Source,
+} from "./lib/marts";
 
-// NOTA: datos de MUESTRA para validar el sistema visual de la Fase 0.
-// En Fase 1 se sustituyen por los marts Gold reales (web/public/data/*.json).
-const SAMPLE_RANKING = [
-  { name: "Proveedor Alfa S.L.", amount: 4_820_000 },
-  { name: "Construcciones Beta S.A.", amount: 3_410_000 },
-  { name: "Servicios Gamma S.L.", amount: 2_180_000 },
-  { name: "Tecnología Delta S.A.", amount: 1_640_000 },
-  { name: "Limpiezas Epsilon S.L.", amount: 980_000 },
-];
-
-const SAMPLE_CCAA = [
-  { code: "MAD", v: 6 },
-  { code: "CAT", v: 6 },
-  { code: "AND", v: 5 },
-  { code: "CVA", v: 4 },
-  { code: "GAL", v: 3 },
-  { code: "PVA", v: 4 },
-  { code: "CYL", v: 3 },
-  { code: "CLM", v: 2 },
-  { code: "MUR", v: 2 },
-  { code: "ARA", v: 2 },
-  { code: "CAN", v: 3 },
-  { code: "EXT", v: 1 },
-];
-
-const SAMPLE_SERIES = [38, 42, 40, 55, 61, 58, 67, 72, 69, 81, 88, 84];
-const FILTERS = ["Todas", "Contratos menores", "Perfil contratante", "Agregaciones", "Encargos"];
-
-const eur = new Intl.NumberFormat("es-ES", {
-  style: "currency",
-  currency: "EUR",
-  maximumFractionDigits: 0,
-});
+type Filter = Source | "todas";
+const SOURCES: Source[] = ["contratos_menores", "perfil_contratante", "agregaciones", "encargos"];
+const PERIODS = ["2012–2026", "2018–2026", "2022–2026"];
 
 export default function App() {
-  const [period, setPeriod] = useState("2012–2026");
-  const [source, setSource] = useState("Todas");
-  const maxRank = SAMPLE_RANKING[0].amount;
+  const [marts, setMarts] = useState<Marts | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [source, setSource] = useState<Filter>("todas");
+  const [period, setPeriod] = useState(PERIODS[0]);
+
+  useEffect(() => {
+    loadMarts().then(setMarts).catch((e) => setError(String(e.message ?? e)));
+  }, []);
+
+  const view = useMemo(() => {
+    if (!marts) return null;
+    const inSource = <T extends { source: Source }>(rows: T[]) =>
+      source === "todas" ? rows : rows.filter((r) => r.source === source);
+
+    const resumen = inSource(marts.resumen);
+    const totalImporte = resumen.reduce((a, r) => a + (r.importe ?? 0), 0);
+    const totalContratos = resumen.reduce((a, r) => a + r.contratos, 0);
+    const totalAdj = resumen.reduce((a, r) => a + r.adjudicatarios, 0);
+
+    const ccaaMap = sumBy(inSource(marts.territorio), (r) => r.ccaa, (r) => r.importe);
+    const ccaa = [...ccaaMap.entries()]
+      .map(([nombre, importe]) => ({ nombre, importe }))
+      .sort((a, b) => b.importe - a.importe);
+    const maxCcaa = ccaa[0]?.importe ?? 1;
+
+    const serieMap = sumBy(inSource(marts.serie), (r) => String(r.year), (r) => r.importe);
+    const serie = [...serieMap.entries()]
+      .map(([y, importe]) => ({ year: +y, importe }))
+      .sort((a, b) => a.year - b.year);
+    const maxSerie = Math.max(...serie.map((s) => s.importe), 1);
+
+    const adjMap = new Map<string, { nombre: string; importe: number; contratos: number }>();
+    for (const r of inSource(marts.adjudicatarios)) {
+      const cur = adjMap.get(r.id) ?? { nombre: r.nombre, importe: 0, contratos: 0 };
+      cur.importe += r.importe ?? 0;
+      cur.contratos += r.contratos;
+      adjMap.set(r.id, cur);
+    }
+    const ranking = [...adjMap.values()].sort((a, b) => b.importe - a.importe).slice(0, 10);
+    const maxRank = ranking[0]?.importe ?? 1;
+
+    const amN = resumen.reduce((a, r) => a + (r.n_acuerdo_marco ?? 0), 0);
+    const amImporte = resumen.reduce((a, r) => a + (r.importe_acuerdo_marco ?? 0), 0);
+    const revN = resumen.reduce((a, r) => a + (r.n_revisar ?? 0), 0);
+    const revImporte = resumen.reduce((a, r) => a + (r.importe_revisar ?? 0), 0);
+    const contratos = (source === "todas"
+      ? marts.contratos
+      : marts.contratos.filter((c) => c.source === source)).slice(0, 12);
+
+    return {
+      totalImporte, totalContratos, totalAdj, ccaa, maxCcaa, serie, maxSerie, ranking, maxRank,
+      amN, amImporte, revN, revImporte, contratos,
+    };
+  }, [marts, source]);
 
   return (
     <div className="app">
@@ -52,10 +84,8 @@ export default function App() {
           <span className="kbd">/</span>
         </label>
         <div className="period" role="group" aria-label="Periodo">
-          {["2012–2026", "2018–2026", "2022–2026"].map((p) => (
-            <button key={p} aria-pressed={period === p} onClick={() => setPeriod(p)}>
-              {p}
-            </button>
+          {PERIODS.map((p) => (
+            <button key={p} aria-pressed={period === p} onClick={() => setPeriod(p)}>{p}</button>
           ))}
         </div>
       </header>
@@ -64,24 +94,12 @@ export default function App() {
         <div className="filter-group">
           <h2>Fuente</h2>
           <div className="chip-list">
-            {FILTERS.map((f) => (
-              <button
-                key={f}
-                className="chip"
-                aria-pressed={source === f}
-                onClick={() => setSource(f)}
-              >
-                {f}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="filter-group">
-          <h2>Territorio</h2>
-          <div className="chip-list">
-            {["Nacional", "Por CCAA", "Por provincia"].map((f) => (
-              <button key={f} className="chip" aria-pressed={f === "Por CCAA"}>
-                {f}
+            <button className="chip" aria-pressed={source === "todas"} onClick={() => setSource("todas")}>
+              Todas
+            </button>
+            {SOURCES.map((s) => (
+              <button key={s} className="chip" aria-pressed={source === s} onClick={() => setSource(s)}>
+                {SOURCE_LABEL[s]}
               </button>
             ))}
           </div>
@@ -90,114 +108,142 @@ export default function App() {
           <h2>Indicadores</h2>
           <div className="chip-list">
             {["Concentración proveedores", "Importes bajo umbral", "Alineación política"].map((f) => (
-              <button key={f} className="chip">
-                {f}
-              </button>
+              <button key={f} className="chip" disabled title="Próximamente (Fase 2)">{f}</button>
             ))}
           </div>
         </div>
       </aside>
 
       <main className="canvas">
-        <section className="card wide">
-          <div className="card-head">
-            <h3>Resumen</h3>
-            <span className="meta">{period} · {source} · <span className="badge">MUESTRA</span></span>
-          </div>
-          <div className="stat-row">
-            <div className="stat">
-              <div className="value">{eur.format(48_200_000_000)}</div>
-              <div className="label">Importe adjudicado (acumulado)</div>
-            </div>
-            <div className="stat">
-              <div className="value">1,284,902</div>
-              <div className="label">Contratos</div>
-            </div>
-            <div className="stat">
-              <div className="value">61,430</div>
-              <div className="label">Adjudicatarios</div>
-            </div>
-          </div>
-        </section>
+        {error && (
+          <section className="card wide">
+            <div className="card-head"><h3>Sin datos todavía</h3></div>
+            <p style={{ color: "var(--ink-2)", lineHeight: 1.6 }}>
+              {error}<br />
+              Genera los marts con <code>python -m contratos_pipeline marts</code> y recarga.
+            </p>
+          </section>
+        )}
 
-        <section className="card">
-          <div className="card-head">
-            <h3>Gasto por CCAA</h3>
-            <span className="meta">€ per cápita · normalizado</span>
-          </div>
-          <div className="map">
-            {SAMPLE_CCAA.map((c) => (
-              <div
-                key={c.code}
-                className="cell"
-                style={{ background: `var(--seq-${c.v})` }}
-                title={`${c.code}`}
-              >
-                {c.code}
+        {!error && !view && (
+          <section className="card wide"><div className="card-head"><h3>Cargando datos…</h3></div>
+            <div className="spark">{Array.from({ length: 12 }).map((_, i) => (
+              <div className="col" style={{ height: `${20 + (i % 5) * 15}%`, opacity: 0.4 }} key={i} />
+            ))}</div>
+          </section>
+        )}
+
+        {view && (
+          <>
+            <section className="card wide">
+              <div className="card-head">
+                <h3>Resumen</h3>
+                <span className="meta">{period} · {source === "todas" ? "todas las fuentes" : SOURCE_LABEL[source as Source]} · <span className="badge">datos reales</span></span>
               </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="card">
-          <div className="card-head">
-            <h3>Top adjudicatarios</h3>
-            <span className="meta">por importe</span>
-          </div>
-          <div className="ranking">
-            {SAMPLE_RANKING.map((r, i) => (
-              <div className="rank-row" key={r.name}>
-                <span className="idx">{i + 1}</span>
-                <span className="name">{r.name}</span>
-                <span className="amount">{eur.format(r.amount)}</span>
-                <div className="bar" style={{ width: `${(r.amount / maxRank) * 100}%` }} />
+              <div className="stat-row">
+                <div className="stat"><div className="value">{eur(view.totalImporte)}</div><div className="label">Importe total (todo incluido)</div></div>
+                <div className="stat"><div className="value">{num(view.totalContratos)}</div><div className="label">Contratos (deduplicados)</div></div>
+                <div className="stat"><div className="value">{num(view.totalAdj)}</div><div className="label">Adjudicatarios</div></div>
               </div>
-            ))}
-          </div>
-        </section>
+              {(view.amN > 0 || view.revN > 0) && (
+                <p className="meta" style={{ marginTop: "var(--sp-3)" }}>
+                  Composición: incluye {num(view.amN)} acuerdos marco ({eur(view.amImporte)} — son techos, no gasto)
+                  {view.revN > 0 && <> · {num(view.revN)} a verificar ({eur(view.revImporte)})</>}. Nada se excluye del total.
+                </p>
+              )}
+            </section>
 
-        <section className="card wide">
-          <div className="card-head">
-            <h3>Evolución del gasto</h3>
-            <span className="meta">por año · {period}</span>
-          </div>
-          <div className="spark">
-            {SAMPLE_SERIES.map((v, i) => (
-              <div className="col" style={{ height: `${v}%` }} key={i} />
-            ))}
-          </div>
-        </section>
+            <section className="card">
+              <div className="card-head"><h3>Gasto por CCAA</h3><span className="meta">importe canónico</span></div>
+              <div className="map">
+                {view.ccaa.slice(0, 18).map((c) => {
+                  const norm = Math.sqrt(c.importe / view.maxCcaa);
+                  const bucket = Math.min(6, Math.max(1, 1 + Math.floor(norm * 5.99)));
+                  return (
+                    <div className="cell" key={c.nombre} style={{ background: `var(--seq-${bucket})` }}
+                      title={`${c.nombre}: ${eur(c.importe)}`}>
+                      {CCAA_ABBR[c.nombre] ?? c.nombre.slice(0, 3).toUpperCase()}
+                    </div>
+                  );
+                })}
+              </div>
+              {view.ccaa.length === 0 && <p className="meta">Sin territorio asignado en esta selección.</p>}
+            </section>
+
+            <section className="card">
+              <div className="card-head"><h3>Top adjudicatarios</h3><span className="meta">por importe adjudicado</span></div>
+              <div className="ranking">
+                {view.ranking.map((r, i) => (
+                  <div className="rank-row" key={r.nombre + i}>
+                    <span className="idx">{i + 1}</span>
+                    <span className="name" title={r.nombre}>{r.nombre}</span>
+                    <span className="amount">{eur(r.importe)}</span>
+                    <div className="bar" style={{ width: `${(r.importe / view.maxRank) * 100}%` }} />
+                  </div>
+                ))}
+                {view.ranking.length === 0 && <p className="meta">Sin adjudicaciones en esta selección.</p>}
+              </div>
+            </section>
+
+            <section className="card wide">
+              <div className="card-head"><h3>Evolución del gasto</h3><span className="meta">por año</span></div>
+              <div className="spark">
+                {view.serie.map((s) => (
+                  <div className="col" key={s.year}
+                    style={{ height: `${Math.max(3, (s.importe / view.maxSerie) * 100)}%` }}
+                    title={`${s.year}: ${eur(s.importe)}`} />
+                ))}
+              </div>
+              <div className="meta" style={{ marginTop: "var(--sp-2)" }}>
+                {view.serie.map((s) => s.year).join("  ·  ") || "—"}
+              </div>
+            </section>
+
+            <section className="card wide">
+              <div className="card-head">
+                <h3>Contratos más grandes</h3>
+                <span className="meta">objetividad · nada se oculta</span>
+              </div>
+              <div className="biglist">
+                {view.contratos.map((c, i) => (
+                  <div className="big-row" key={(c.id_origen ?? "") + i}>
+                    <span className="amount">{eur(c.importe)}</span>
+                    <span className="tags">
+                      {c.es_acuerdo_marco && <span className="tag tag-am">acuerdo marco</span>}
+                      {c.revisar_importe && <span className="tag tag-rev">a verificar</span>}
+                    </span>
+                    <span className="name" title={c.objeto ?? ""}>
+                      {c.adjudicatario_nombre || c.organo_nombre || c.objeto || "—"}
+                    </span>
+                    {c.link_detalle && (
+                      <a className="ext" href={c.link_detalle} target="_blank" rel="noreferrer" title="Ver en PLACSP">↗</a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
       </main>
 
       <aside className="context">
         <h2>Contexto del dato</h2>
-        <div className="kv">
-          <span className="k">Fuente</span>
-          <span className="v">PLACSP · datos.gob.es</span>
+        <div className="kv"><span className="k">Fuente</span><span className="v">PLACSP · datos.gob.es</span></div>
+        <div className="kv"><span className="k">Periodo cargado</span><span className="v">2024–2026 (histórico en progreso)</span></div>
+        <div className="kv"><span className="k">Cobertura por fuente</span>
+          <span className="v">{SOURCES.map((s) => `${SOURCE_LABEL[s]} ${SOURCE_COVERAGE[s]}`).join(" · ")}</span>
         </div>
-        <div className="kv">
-          <span className="k">Periodo</span>
-          <span className="v">{period}</span>
-        </div>
-        <div className="kv">
-          <span className="k">Cobertura</span>
-          <span className="v">Menores 2018+ · Encargos 2022+</span>
-        </div>
-        <div className="kv">
-          <span className="k">Actualización</span>
-          <span className="v">Manual · por lotes</span>
-        </div>
+        <div className="kv"><span className="k">Normalización</span><span className="v">Registro canónico por expediente (estado final)</span></div>
         <div className="disclaimer">
-          Los indicadores (concentración, importes bajo umbral) son <strong>señales para
-          investigar, no acusaciones</strong>. Correlación no implica causalidad. Consulta la
-          metodología antes de extraer conclusiones.
+          Importes <strong>deduplicados</strong> al estado final de cada expediente. Los indicadores
+          son <strong>señales para investigar, no acusaciones</strong>. Correlación no implica causalidad.
         </div>
       </aside>
 
       <footer className="footer">
         <span>Datos públicos reutilizables · PLACSP</span>
         <span>·</span>
-        <span>Fase 0 — sistema visual con datos de muestra</span>
+        <span>Fase 1 — datos reales (marts Gold)</span>
       </footer>
     </div>
   );

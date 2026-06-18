@@ -338,6 +338,43 @@ button {
   padding: 1px 6px;
 }
 
+/* Contratos más grandes (vista de transparencia) */
+.biglist {
+  display: flex;
+  flex-direction: column;
+}
+.big-row {
+  display: grid;
+  grid-template-columns: 150px auto 1fr 16px;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+.big-row:last-child { border-bottom: 0; }
+.big-row .amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+}
+.big-row .name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink-2);
+}
+.tags { display: flex; gap: var(--sp-1); }
+.tag {
+  font-size: var(--fs-12);
+  border-radius: 4px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+.tag-am { color: var(--accent); background: var(--accent-soft); }
+.tag-rev { color: var(--warn); background: var(--warn-soft); border: 1px solid #efd9b8; }
+.ext { color: var(--ink-3); text-decoration: none; }
+.ext:hover { color: var(--accent); }
+
 @keyframes fadeUp {
   from {
     opacity: 0;

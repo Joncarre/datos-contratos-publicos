@@ -24,6 +24,15 @@ def bronze_root() -> Path:
     return processed_root() / "_bronze"
 
 
+def gold_root() -> Path:
+    return processed_root() / "_gold"
+
+
+def web_data_dir() -> Path:
+    """Carpeta donde se publican los marts que consume el frontend."""
+    return repo_root() / "web" / "public" / "data"
+
+
 @dataclass(frozen=True)
 class Source:
     name: str

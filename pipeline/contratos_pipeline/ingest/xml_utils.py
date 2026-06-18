@@ -18,15 +18,17 @@ def local_name(tag: object) -> str:
     return tag.rsplit("}", 1)[-1]
 
 
-def child_by_local(elem: etree._Element, name: str) -> etree._Element | None:
+def child_by_local(elem: etree._Element | None, name: str) -> etree._Element | None:
     """Primer hijo *directo* cuyo local-name coincide."""
+    if elem is None:
+        return None
     for child in elem:
         if local_name(child.tag) == name:
             return child
     return None
 
 
-def text_at_path(elem: etree._Element, path: list[str]) -> str | None:
+def text_at_path(elem: etree._Element | None, path: list[str]) -> str | None:
     """Desciende por hijos directos siguiendo `path` (local-names) y devuelve el texto de la hoja.
 
     Descenso estricto por hijo directo: predecible y sin colisiones por nombres repetidos en
@@ -52,13 +54,25 @@ def first_text(elem: etree._Element, candidates: list[list[str]]) -> str | None:
     return None
 
 
-def element_to_dict(elem: etree._Element) -> Any:
-    """Conversión genérica y fiel del subárbol a dict (para `payload_json`).
+def attr_by_local(elem: etree._Element | None, name: str) -> str | None:
+    """Valor de un atributo buscado por local-name (los atributos pueden llevar namespace)."""
+    if elem is None:
+        return None
+    for key, value in elem.attrib.items():
+        if local_name(key) == name:
+            return value
+    return None
 
-    - Hijos repetidos -> lista.
-    - Atributos -> clave '@attributes'.
-    - Texto en nodo hoja -> el propio string; en nodo con hijos -> clave '#text'.
-    """
+
+def descendants_by_local(elem: etree._Element | None, name: str) -> list[etree._Element]:
+    """Todos los descendientes (cualquier profundidad) con ese local-name."""
+    if elem is None:
+        return []
+    return [e for e in elem.iter() if local_name(e.tag) == name]
+
+
+def element_to_dict(elem: etree._Element) -> Any:
+    """Conversión genérica y fiel del subárbol a dict (para depuración con `parse-file --raw`)."""
     node: dict[str, Any] = {}
 
     if elem.attrib:
@@ -66,7 +80,7 @@ def element_to_dict(elem: etree._Element) -> Any:
 
     for child in elem:
         key = local_name(child.tag)
-        if not key:  # comentario / processing instruction
+        if not key:
             continue
         value = element_to_dict(child)
         if key in node:
