@@ -191,6 +191,56 @@ _MARTS: dict[str, str] = {
         ORDER BY (c.limp - s.med) / (1.4826 * s.madv) DESC NULLS LAST
         LIMIT 200
     """,
+    # Concentración de adjudicaciones por órgano. HHI sobre el NÚMERO de adjudicaciones por
+    # proveedor (robusto a los importes-error; el HHI por importe se distorsiona con el €200B de
+    # Santiago, etc.). HHI en [0,1]: 1 = todas las adjudicaciones a un solo proveedor. Min. 20
+    # contratos. `importe` (sin los errores `revisar`) se muestra solo de contexto. Descriptivo.
+    "concentracion": """
+        WITH adj AS (
+            SELECT organo_id, source, adj_key,
+                   any_value(organo_nombre) AS organo_nombre,
+                   any_value(adjudicatario_nombre) AS adj_nombre,
+                   count(*) AS n,
+                   sum(CASE WHEN revisar_importe THEN 0 ELSE importe END) AS imp_adj
+            FROM contratos
+            WHERE adj_key IS NOT NULL AND status_rank >= 5
+            GROUP BY organo_id, source, adj_key
+        ),
+        org AS (
+            SELECT organo_id, source, any_value(organo_nombre) AS organo_nombre,
+                   sum(n) AS n_contratos, count(*) AS n_adjudicatarios,
+                   sum(power(n, 2)) AS sum_sq_n, sum(imp_adj) AS imp_total,
+                   arg_max(adj_nombre, n) AS top_proveedor, max(n) AS top_n
+            FROM adj GROUP BY organo_id, source
+        )
+        SELECT organo_id, organo_nombre, source, n_contratos, n_adjudicatarios,
+               round(imp_total, 2) AS importe,
+               round(sum_sq_n / nullif(power(n_contratos, 2), 0), 4) AS hhi,
+               top_proveedor, round(100.0 * top_n / nullif(n_contratos, 0), 1) AS pct_dominante
+        FROM org WHERE n_contratos >= 20
+        ORDER BY hhi DESC, n_contratos DESC LIMIT 200
+    """,
+    # Fraccionamiento: contratos menores con importe (sin IVA) pegado al UMBRAL LEGAL (linea
+    # objetiva, no presupuesta: 15k servicios/suministros, 40k obras). Banda [90%, 100%) del umbral.
+    # Pares (organo, proveedor) con >=5 menores en esa banda = patron a investigar (no acusacion).
+    "fraccionamiento": """
+        WITH m AS (
+            SELECT organo_id, organo_nombre, adj_key, adjudicatario_nombre,
+                   importe_sin_iva AS imp,
+                   CASE WHEN tipo_contrato = '3' THEN 40000.0 ELSE 15000.0 END AS umbral
+            FROM contratos
+            WHERE source = 'contratos_menores' AND importe_sin_iva IS NOT NULL
+                  AND adj_key IS NOT NULL
+        )
+        SELECT organo_id, any_value(organo_nombre) AS organo_nombre,
+               adj_key, any_value(adjudicatario_nombre) AS adjudicatario_nombre,
+               count(*) FILTER (WHERE imp >= 0.9 * umbral AND imp < umbral) AS n_cerca_umbral,
+               round(sum(imp) FILTER (WHERE imp >= 0.9 * umbral AND imp < umbral), 2) AS importe_cerca,
+               count(*) AS n_menores_total
+        FROM m GROUP BY organo_id, adj_key
+        HAVING count(*) FILTER (WHERE imp >= 0.9 * umbral AND imp < umbral) >= 5
+        ORDER BY n_cerca_umbral DESC, importe_cerca DESC LIMIT 200
+    """,
 }
 
 

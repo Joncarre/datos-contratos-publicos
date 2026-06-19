@@ -67,10 +67,14 @@ export default function App() {
     const anomalias = (source === "todas"
       ? marts.anomalias
       : marts.anomalias.filter((a) => a.source === source)).slice(0, 12);
+    const concentracion = (source === "todas"
+      ? marts.concentracion
+      : marts.concentracion.filter((c) => c.source === source)).slice(0, 12);
+    const fraccionamiento = marts.fraccionamiento.slice(0, 12);
 
     return {
       totalImporte, totalContratos, totalAdj, ccaa, maxCcaa, serie, maxSerie, ranking, maxRank,
-      amN, amImporte, revN, revImporte, contratos, anomalias,
+      amN, amImporte, revN, revImporte, contratos, anomalias, concentracion, fraccionamiento,
     };
   }, [marts, source]);
 
@@ -249,6 +253,44 @@ export default function App() {
                   </div>
                 ))}
                 {view.anomalias.length === 0 && <p className="meta">Aún sin marts de anomalías (ejecuta `marts`).</p>}
+              </div>
+            </section>
+
+            <section className="card">
+              <div className="card-head">
+                <h3>Concentración por órgano</h3>
+                <span className="meta">HHI sobre nº de adjudicaciones</span>
+              </div>
+              <div className="biglist">
+                {view.concentracion.map((c, i) => (
+                  <div className="big-row" key={(c.organo_id ?? "") + i}>
+                    <span className="amount">HHI {c.hhi.toFixed(2)}</span>
+                    <span className="tags"><span className="tag tag-rev">{c.pct_dominante}%</span></span>
+                    <span className="name" title={c.organo_nombre ?? ""}>
+                      {c.organo_nombre}
+                      <span className="muted"> → {c.top_proveedor} · {c.n_contratos} contr, {c.n_adjudicatarios} prov</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="card">
+              <div className="card-head">
+                <h3>Fraccionamiento (menores)</h3>
+                <span className="meta">menores pegados al umbral legal</span>
+              </div>
+              <div className="biglist">
+                {view.fraccionamiento.map((f, i) => (
+                  <div className="big-row" key={(f.organo_id ?? "") + (f.adj_key ?? "") + i}>
+                    <span className="amount">{f.n_cerca_umbral}×</span>
+                    <span className="tags"><span className="tag tag-rev">cerca umbral</span></span>
+                    <span className="name" title={f.organo_nombre ?? ""}>
+                      {f.organo_nombre} → {f.adjudicatario_nombre}
+                      <span className="muted"> · {eur(f.importe_cerca)} de {num(f.n_menores_total)} menores</span>
+                    </span>
+                  </div>
+                ))}
               </div>
             </section>
           </>

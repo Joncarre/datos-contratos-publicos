@@ -56,6 +56,27 @@ export interface AnomaliaRow {
   link_detalle: string | null;
 }
 
+export interface ConcentracionRow {
+  organo_id: string | null;
+  organo_nombre: string | null;
+  source: Source;
+  n_contratos: number;
+  n_adjudicatarios: number;
+  importe: number | null;
+  hhi: number;
+  top_proveedor: string | null;
+  pct_dominante: number | null;
+}
+export interface FraccionamientoRow {
+  organo_id: string | null;
+  organo_nombre: string | null;
+  adj_key: string | null;
+  adjudicatario_nombre: string | null;
+  n_cerca_umbral: number;
+  importe_cerca: number | null;
+  n_menores_total: number;
+}
+
 export interface Marts {
   resumen: ResumenRow[];
   serie: SerieRow[];
@@ -64,6 +85,8 @@ export interface Marts {
   organos: RankRow[];
   contratos: ContratoRow[];
   anomalias: AnomaliaRow[];
+  concentracion: ConcentracionRow[];
+  fraccionamiento: FraccionamientoRow[];
 }
 
 const BASE = import.meta.env.BASE_URL + "data/";
@@ -85,7 +108,14 @@ export async function loadMarts(): Promise<Marts> {
       getJSON<ContratoRow[]>("top_contratos"),
       getJSON<AnomaliaRow[]>("anomalias"),
     ]);
-  return { resumen, serie, territorio, adjudicatarios, organos, contratos, anomalias };
+  const [concentracion, fraccionamiento] = await Promise.all([
+    getJSON<ConcentracionRow[]>("concentracion"),
+    getJSON<FraccionamientoRow[]>("fraccionamiento"),
+  ]);
+  return {
+    resumen, serie, territorio, adjudicatarios, organos, contratos, anomalias,
+    concentracion, fraccionamiento,
+  };
 }
 
 export const SOURCE_LABEL: Record<Source, string> = {

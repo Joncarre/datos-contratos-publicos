@@ -37,11 +37,11 @@ Los importes altos o atípicos son **señales, no ruido**: el mart `top_contrato
 ### Anomalías de importe (data-driven, relativas a pares)
 Para cada contrato se compara su importe con el de **contratos similares** (misma división CPV + tipo de contrato) mediante un **z robusto**: `score = (ln(importe) − mediana_pares) / (1,4826 · MAD_pares)`. El signo indica + (mucho más caro que sus pares) o − (mucho más barato). **No se presupone ningún umbral absoluto de "normal"**: es la propia distribución de cada grupo la que define qué es atípico. Requiere ≥ 30 pares para ser fiable. Es **descriptivo, no concluyente**: ordena por rareza e invita a investigar (con enlace a PLACSP), nunca afirma irregularidad. Así afloran tanto el error de Santiago como, p. ej., los €4.827 M en "caminos municipales", sin que nadie haya decidido a mano que son anómalos.
 
-### Concentración de proveedores (HHI)
-Índice Herfindahl-Hirschman sobre la cuota de importe por adjudicatario dentro de un órgano/territorio. Alto = pocos proveedores acaparan. **Cautela:** mercados pequeños o especializados concentran de forma legítima.
+### Concentración de adjudicaciones (HHI)
+Índice Herfindahl-Hirschman sobre el **número de adjudicaciones** por adjudicatario dentro de un órgano. (El HHI por importe se distorsiona con los importes-error como el de Santiago; el HHI por conteo es **robusto**.) HHI∈[0,1]: 1 = todas las adjudicaciones a un único proveedor. Mínimo 20 contratos por órgano para estabilidad. **Cautela:** mercados pequeños o regulados (p. ej. distribución eléctrica) concentran de forma legítima; es señal para mirar, no prueba.
 
-### Importes bajo umbral
-Distribución de importes de contratos menores respecto a los **umbrales legales** (`dim_umbral`). Una acumulación justo por debajo del umbral es un patrón llamativo. **Cautela:** muchos servicios cuestan legítimamente cerca del umbral; es señal, no prueba.
+### Fraccionamiento (importes pegados al umbral)
+Para contratos menores, se cuentan los que tienen importe (sin IVA) en la banda **[90 %, 100 %) del umbral legal** —línea **objetiva**, no presupuesta por nosotros: 15.000 € servicios/suministros, 40.000 € obras—. Los pares (órgano, proveedor) con ≥5 contratos en esa banda señalan posible fraccionamiento. **Cautela:** muchos suministros recurrentes cuestan legítimamente cerca del umbral; es patrón a investigar, no acusación.
 
 ### Alineación política (exploratorio — con limitaciones graves, NO concluyente)
 Compara la contratación **estatal** (`organo_nivel = 'estatal'`, Administración General del Estado) territorializada por CCAA según la **alineación** del partido del gobierno central con el de la presidencia autonómica.
