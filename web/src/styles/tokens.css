@@ -14,17 +14,20 @@
   --fs-28: 1.75rem;
   --fs-40: 2.5rem;
 
-  /* Superficies (blanco cálido, no puro) */
-  --bg: #fafaf8;
+  /* Superficies (papel reciclado, no blanco puro) */
+  --bg: #faf9f6;
   --surface: #ffffff;
-  --surface-2: #f4f4f1;
-  --border: #e6e6e0;
-  --border-strong: #d4d4cc;
+  --surface-2: #f3f2ed;
+  /* Bordes en rgba: definen regiones sin llamar la atención (squint test) */
+  --border: rgba(24, 22, 16, 0.1);
+  --border-subtle: rgba(24, 22, 16, 0.06);
+  --border-strong: rgba(24, 22, 16, 0.18);
 
-  /* Tinta */
-  --ink: #0e0e0c;
-  --ink-2: #4a4a45;
-  --ink-3: #8a8a82;
+  /* Tinta — jerarquía de texto a 4 niveles */
+  --ink: #15140f;
+  --ink-2: #4d4a42;
+  --ink-3: #8a867a;
+  --ink-4: #b3afa3;
 
   /* Acento único + semánticos (uso parco) */
   --accent: #1d4ed8;

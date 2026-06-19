@@ -376,6 +376,79 @@ button {
 .ext:hover { color: var(--accent); }
 .muted { color: var(--ink-3); }
 
+.search input::placeholder { color: var(--ink-4); }
+
+/* Índice del expediente (navegación de secciones) — la firma del producto */
+.index {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: var(--sp-6);
+}
+.folio {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--sp-3);
+  align-items: baseline;
+  text-align: left;
+  padding: var(--sp-2);
+  border: 0;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  border-left: 2px solid transparent;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.folio:hover {
+  background: var(--surface-2);
+}
+.folio[aria-current="page"] {
+  background: var(--surface-2);
+  border-left-color: var(--accent);
+}
+.folio .num {
+  font-family: var(--font-display);
+  font-size: var(--fs-12);
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+  padding-top: 2px;
+}
+.folio[aria-current="page"] .num {
+  color: var(--accent);
+}
+.folio .lbl {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.folio .lbl .t {
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.folio[aria-current="page"] .lbl .t {
+  color: var(--ink);
+}
+.folio .lbl .s {
+  font-size: var(--fs-12);
+  color: var(--ink-3);
+}
+
+/* Cabecera de sección en el lienzo (location indicator) */
+.section-head {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--border);
+}
+.section-head h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-28);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
 @keyframes fadeUp {
   from {
     opacity: 0;
