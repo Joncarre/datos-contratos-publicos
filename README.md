@@ -64,6 +64,7 @@ npm run dev
 - **`top_contratos`, `top_adjudicatarios`, `top_organos`** — los más grandes, con banderas y enlace a PLACSP.
 - **`anomalias`** — sobrecoste relativo a contratos similares (z robusto por CPV+tipo; **sin umbrales presupuestos**).
 - **`concentracion`** — HHI de adjudicaciones por órgano (sobre nº de contratos, robusto a importes-error).
+- **`proveedores`** — vista proveedor-céntrica: importe, nº de órganos y **dependencia** de un único órgano (posible captura).
 - **`fraccionamiento`** — contratos menores pegados al **umbral legal** (15k/40k €), por órgano-proveedor.
 - **`politica`, `politica_did`** — alineación CCAA↔gobierno central. **Exploratorio, NO concluyente** (efecto sede de Madrid; ver metodología).
 

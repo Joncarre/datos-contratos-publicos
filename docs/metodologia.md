@@ -40,6 +40,9 @@ Para cada contrato se compara su importe con el de **contratos similares** (mism
 ### Concentración de adjudicaciones (HHI)
 Índice Herfindahl-Hirschman sobre el **número de adjudicaciones** por adjudicatario dentro de un órgano. (El HHI por importe se distorsiona con los importes-error como el de Santiago; el HHI por conteo es **robusto**.) HHI∈[0,1]: 1 = todas las adjudicaciones a un único proveedor. Mínimo 20 contratos por órgano para estabilidad. **Cautela:** mercados pequeños o regulados (p. ej. distribución eléctrica) concentran de forma legítima; es señal para mirar, no prueba.
 
+### Proveedores recurrentes (dependencia / captura)
+Vista proveedor-céntrica: por adjudicatario, importe total, nº de órganos distintos que le adjudican y **% de sus contratos que vienen de un único órgano** (`pct_top_organo`). Una dependencia muy alta de un solo comprador es una señal a mirar (captura/relación exclusiva), no una acusación. Mínimo 10 contratos.
+
 ### Fraccionamiento (importes pegados al umbral)
 Para contratos menores, se cuentan los que tienen importe (sin IVA) en la banda **[90 %, 100 %) del umbral legal** —línea **objetiva**, no presupuesta por nosotros: 15.000 € servicios/suministros, 40.000 € obras—. Los pares (órgano, proveedor) con ≥5 contratos en esa banda señalan posible fraccionamiento. **Cautela:** muchos suministros recurrentes cuestan legítimamente cerca del umbral; es patrón a investigar, no acusación.
 

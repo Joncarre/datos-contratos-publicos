@@ -241,6 +241,30 @@ _MARTS: dict[str, str] = {
         HAVING count(*) FILTER (WHERE imp >= 0.9 * umbral AND imp < umbral) >= 5
         ORDER BY n_cerca_umbral DESC, importe_cerca DESC LIMIT 200
     """,
+    # Vista proveedor-céntrica (proveedores recurrentes). Por adjudicatario: importe, nº de
+    # órganos distintos que le adjudican y % de sus contratos que vienen de un ÚNICO órgano
+    # (alta dependencia = posible captura). Descriptivo. Importe sin los errores `revisar`.
+    "proveedores": """
+        WITH a AS (
+            SELECT adj_key, organo_id,
+                   any_value(adjudicatario_nombre) AS nombre,
+                   any_value(organo_nombre) AS organo_nombre,
+                   count(*) AS n,
+                   sum(CASE WHEN revisar_importe THEN 0 ELSE importe END) AS imp
+            FROM contratos WHERE adj_key IS NOT NULL AND status_rank >= 5
+            GROUP BY adj_key, organo_id
+        ),
+        p AS (
+            SELECT adj_key, any_value(nombre) AS nombre,
+                   sum(n) AS n_contratos, sum(imp) AS importe, count(*) AS n_organos,
+                   arg_max(organo_nombre, n) AS top_organo, max(n) AS top_organo_n
+            FROM a GROUP BY adj_key
+        )
+        SELECT adj_key AS id, nombre, n_contratos, n_organos, round(importe, 2) AS importe,
+               top_organo, round(100.0 * top_organo_n / nullif(n_contratos, 0), 1) AS pct_top_organo
+        FROM p WHERE n_contratos >= 10
+        ORDER BY importe DESC NULLS LAST LIMIT 200
+    """,
 }
 
 

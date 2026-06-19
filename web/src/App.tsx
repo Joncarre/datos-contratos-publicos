@@ -71,10 +71,12 @@ export default function App() {
       ? marts.concentracion
       : marts.concentracion.filter((c) => c.source === source)).slice(0, 12);
     const fraccionamiento = marts.fraccionamiento.slice(0, 12);
+    const proveedores = marts.proveedores.slice(0, 12);
 
     return {
       totalImporte, totalContratos, totalAdj, ccaa, maxCcaa, serie, maxSerie, ranking, maxRank,
       amN, amImporte, revN, revImporte, contratos, anomalias, concentracion, fraccionamiento,
+      proveedores,
     };
   }, [marts, source]);
 
@@ -288,6 +290,27 @@ export default function App() {
                     <span className="name" title={f.organo_nombre ?? ""}>
                       {f.organo_nombre} → {f.adjudicatario_nombre}
                       <span className="muted"> · {eur(f.importe_cerca)} de {num(f.n_menores_total)} menores</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="card wide">
+              <div className="card-head">
+                <h3>Proveedores recurrentes</h3>
+                <span className="meta">importe · nº de órganos · dependencia de uno solo</span>
+              </div>
+              <div className="biglist">
+                {view.proveedores.map((p, i) => (
+                  <div className="big-row" key={(p.id ?? "") + i}>
+                    <span className="amount">{eur(p.importe)}</span>
+                    <span className="tags">
+                      <span className="tag tag-am">{num(p.n_organos)} órganos · {p.pct_top_organo}% de 1</span>
+                    </span>
+                    <span className="name" title={p.top_organo ?? ""}>
+                      {p.nombre}
+                      <span className="muted"> · {num(p.n_contratos)} contratos</span>
                     </span>
                   </div>
                 ))}

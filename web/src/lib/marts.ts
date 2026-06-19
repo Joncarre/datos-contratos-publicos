@@ -77,6 +77,16 @@ export interface FraccionamientoRow {
   n_menores_total: number;
 }
 
+export interface ProveedorRow {
+  id: string | null;
+  nombre: string | null;
+  n_contratos: number;
+  n_organos: number;
+  importe: number | null;
+  top_organo: string | null;
+  pct_top_organo: number | null;
+}
+
 export interface Marts {
   resumen: ResumenRow[];
   serie: SerieRow[];
@@ -87,6 +97,7 @@ export interface Marts {
   anomalias: AnomaliaRow[];
   concentracion: ConcentracionRow[];
   fraccionamiento: FraccionamientoRow[];
+  proveedores: ProveedorRow[];
 }
 
 const BASE = import.meta.env.BASE_URL + "data/";
@@ -108,13 +119,14 @@ export async function loadMarts(): Promise<Marts> {
       getJSON<ContratoRow[]>("top_contratos"),
       getJSON<AnomaliaRow[]>("anomalias"),
     ]);
-  const [concentracion, fraccionamiento] = await Promise.all([
+  const [concentracion, fraccionamiento, proveedores] = await Promise.all([
     getJSON<ConcentracionRow[]>("concentracion"),
     getJSON<FraccionamientoRow[]>("fraccionamiento"),
+    getJSON<ProveedorRow[]>("proveedores"),
   ]);
   return {
     resumen, serie, territorio, adjudicatarios, organos, contratos, anomalias,
-    concentracion, fraccionamiento,
+    concentracion, fraccionamiento, proveedores,
   };
 }
 
