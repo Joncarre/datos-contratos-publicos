@@ -1,0 +1,1332 @@
+[
+  {
+    "anio": 2012,
+    "ccaa": "Andalucía",
+    "poblacion": 8393159
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Aragón",
+    "poblacion": 1338308
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Asturias",
+    "poblacion": 1067802
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Cantabria",
+    "poblacion": 590037
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Ceuta",
+    "poblacion": 84534
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Castilla y León",
+    "poblacion": 2518528
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2094391
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Canarias",
+    "poblacion": 2105232
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Cataluña",
+    "poblacion": 7480921
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Extremadura",
+    "poblacion": 1100968
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Galicia",
+    "poblacion": 2761970
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1110115
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1461987
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 6414709
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Melilla",
+    "poblacion": 83619
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Navarra",
+    "poblacion": 638949
+  },
+  {
+    "anio": 2012,
+    "ccaa": "País Vasco",
+    "poblacion": 2177006
+  },
+  {
+    "anio": 2012,
+    "ccaa": "La Rioja",
+    "poblacion": 318639
+  },
+  {
+    "anio": 2012,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 4987017
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Andalucía",
+    "poblacion": 8388875
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Aragón",
+    "poblacion": 1331301
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Asturias",
+    "poblacion": 1058975
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Cantabria",
+    "poblacion": 587682
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Ceuta",
+    "poblacion": 84674
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Castilla y León",
+    "poblacion": 2495689
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2075197
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Canarias",
+    "poblacion": 2114845
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Cataluña",
+    "poblacion": 7416237
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Extremadura",
+    "poblacion": 1096421
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Galicia",
+    "poblacion": 2747226
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1115841
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1461803
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 6378297
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Melilla",
+    "poblacion": 83870
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Navarra",
+    "poblacion": 636450
+  },
+  {
+    "anio": 2013,
+    "ccaa": "País Vasco",
+    "poblacion": 2167166
+  },
+  {
+    "anio": 2013,
+    "ccaa": "La Rioja",
+    "poblacion": 315223
+  },
+  {
+    "anio": 2013,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 4956427
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Andalucía",
+    "poblacion": 8399618
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Aragón",
+    "poblacion": 1326403
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Asturias",
+    "poblacion": 1049875
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Cantabria",
+    "poblacion": 585359
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Ceuta",
+    "poblacion": 84692
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Castilla y León",
+    "poblacion": 2478079
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2062767
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Canarias",
+    "poblacion": 2126144
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Cataluña",
+    "poblacion": 7396991
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Extremadura",
+    "poblacion": 1091623
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Galicia",
+    "poblacion": 2734656
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1124972
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1463773
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 6385298
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Melilla",
+    "poblacion": 84570
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Navarra",
+    "poblacion": 636402
+  },
+  {
+    "anio": 2014,
+    "ccaa": "País Vasco",
+    "poblacion": 2165100
+  },
+  {
+    "anio": 2014,
+    "ccaa": "La Rioja",
+    "poblacion": 313569
+  },
+  {
+    "anio": 2014,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 4939674
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Andalucía",
+    "poblacion": 8403774
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Aragón",
+    "poblacion": 1318571
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Asturias",
+    "poblacion": 1040925
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Cantabria",
+    "poblacion": 582504
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Ceuta",
+    "poblacion": 84652
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Castilla y León",
+    "poblacion": 2454454
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2048900
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Canarias",
+    "poblacion": 2135209
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Cataluña",
+    "poblacion": 7408290
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Extremadura",
+    "poblacion": 1084969
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Galicia",
+    "poblacion": 2720102
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1135527
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1466474
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 6424275
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Melilla",
+    "poblacion": 84764
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Navarra",
+    "poblacion": 637486
+  },
+  {
+    "anio": 2015,
+    "ccaa": "País Vasco",
+    "poblacion": 2164066
+  },
+  {
+    "anio": 2015,
+    "ccaa": "La Rioja",
+    "poblacion": 312810
+  },
+  {
+    "anio": 2015,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 4932347
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Andalucía",
+    "poblacion": 8408825
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Aragón",
+    "poblacion": 1316040
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Asturias",
+    "poblacion": 1034277
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Cantabria",
+    "poblacion": 581476
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Ceuta",
+    "poblacion": 85033
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Castilla y León",
+    "poblacion": 2435867
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2040939
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Canarias",
+    "poblacion": 2154924
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Cataluña",
+    "poblacion": 7441140
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Extremadura",
+    "poblacion": 1077506
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Galicia",
+    "poblacion": 2710129
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1150935
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1472977
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 6476705
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Melilla",
+    "poblacion": 84943
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Navarra",
+    "poblacion": 640337
+  },
+  {
+    "anio": 2016,
+    "ccaa": "País Vasco",
+    "poblacion": 2167283
+  },
+  {
+    "anio": 2016,
+    "ccaa": "La Rioja",
+    "poblacion": 312618
+  },
+  {
+    "anio": 2016,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 4935084
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Andalucía",
+    "poblacion": 8410094
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Aragón",
+    "poblacion": 1313135
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Asturias",
+    "poblacion": 1027624
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Cantabria",
+    "poblacion": 581294
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Ceuta",
+    "poblacion": 85209
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Castilla y León",
+    "poblacion": 2418556
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2032595
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Canarias",
+    "poblacion": 2177048
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Cataluña",
+    "poblacion": 7488717
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Extremadura",
+    "poblacion": 1070453
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Galicia",
+    "poblacion": 2703149
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1166923
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1475569
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 6549519
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Melilla",
+    "poblacion": 84708
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Navarra",
+    "poblacion": 643866
+  },
+  {
+    "anio": 2017,
+    "ccaa": "País Vasco",
+    "poblacion": 2170868
+  },
+  {
+    "anio": 2017,
+    "ccaa": "La Rioja",
+    "poblacion": 312884
+  },
+  {
+    "anio": 2017,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 4946233
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Andalucía",
+    "poblacion": 8427404
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Aragón",
+    "poblacion": 1320586
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Asturias",
+    "poblacion": 1022205
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Cantabria",
+    "poblacion": 581641
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Ceuta",
+    "poblacion": 84829
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Castilla y León",
+    "poblacion": 2407733
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2034877
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Canarias",
+    "poblacion": 2206901
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Cataluña",
+    "poblacion": 7566430
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Extremadura",
+    "poblacion": 1065424
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Galicia",
+    "poblacion": 2700441
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1188220
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1487663
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 6641648
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Melilla",
+    "poblacion": 84689
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Navarra",
+    "poblacion": 649946
+  },
+  {
+    "anio": 2018,
+    "ccaa": "País Vasco",
+    "poblacion": 2177880
+  },
+  {
+    "anio": 2018,
+    "ccaa": "La Rioja",
+    "poblacion": 313571
+  },
+  {
+    "anio": 2018,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 4974969
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Andalucía",
+    "poblacion": 8478084
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Aragón",
+    "poblacion": 1330333
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Asturias",
+    "poblacion": 1018899
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Cantabria",
+    "poblacion": 582388
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Ceuta",
+    "poblacion": 84085
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Castilla y León",
+    "poblacion": 2401307
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2045554
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Canarias",
+    "poblacion": 2236992
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Cataluña",
+    "poblacion": 7652348
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Extremadura",
+    "poblacion": 1061979
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Galicia",
+    "poblacion": 2702592
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1210725
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1504869
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 6747068
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Melilla",
+    "poblacion": 84473
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Navarra",
+    "poblacion": 656509
+  },
+  {
+    "anio": 2019,
+    "ccaa": "País Vasco",
+    "poblacion": 2189138
+  },
+  {
+    "anio": 2019,
+    "ccaa": "La Rioja",
+    "poblacion": 315931
+  },
+  {
+    "anio": 2019,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 5029341
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Andalucía",
+    "poblacion": 8502217
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Aragón",
+    "poblacion": 1331133
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Asturias",
+    "poblacion": 1012889
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Cantabria",
+    "poblacion": 583655
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Ceuta",
+    "poblacion": 83517
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Castilla y León",
+    "poblacion": 2386649
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2048656
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Canarias",
+    "poblacion": 2244369
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Cataluña",
+    "poblacion": 7671253
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Extremadura",
+    "poblacion": 1057999
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Galicia",
+    "poblacion": 2696876
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1219775
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1513076
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 6755828
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Melilla",
+    "poblacion": 84022
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Navarra",
+    "poblacion": 657654
+  },
+  {
+    "anio": 2020,
+    "ccaa": "País Vasco",
+    "poblacion": 2185908
+  },
+  {
+    "anio": 2020,
+    "ccaa": "La Rioja",
+    "poblacion": 316176
+  },
+  {
+    "anio": 2020,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 5047045
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Andalucía",
+    "poblacion": 8509750
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Aragón",
+    "poblacion": 1336899
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Asturias",
+    "poblacion": 1005467
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Cantabria",
+    "poblacion": 585538
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Ceuta",
+    "poblacion": 82995
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Castilla y León",
+    "poblacion": 2375979
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2057370
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Canarias",
+    "poblacion": 2185693
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Cataluña",
+    "poblacion": 7769266
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Extremadura",
+    "poblacion": 1057435
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Galicia",
+    "poblacion": 2692584
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1186723
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1531293
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 6726884
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Melilla",
+    "poblacion": 85286
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Navarra",
+    "poblacion": 664299
+  },
+  {
+    "anio": 2021,
+    "ccaa": "País Vasco",
+    "poblacion": 2207580
+  },
+  {
+    "anio": 2021,
+    "ccaa": "La Rioja",
+    "poblacion": 319069
+  },
+  {
+    "anio": 2021,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 5106666
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Andalucía",
+    "poblacion": 8574691
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Aragón",
+    "poblacion": 1349306
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Asturias",
+    "poblacion": 1006188
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Cantabria",
+    "poblacion": 588253
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Ceuta",
+    "poblacion": 82884
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Castilla y León",
+    "poblacion": 2381572
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2080351
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Canarias",
+    "poblacion": 2212018
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Cataluña",
+    "poblacion": 7896306
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Extremadura",
+    "poblacion": 1054257
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Galicia",
+    "poblacion": 2699060
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1207319
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1552240
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 6848354
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Melilla",
+    "poblacion": 85664
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Navarra",
+    "poblacion": 671855
+  },
+  {
+    "anio": 2022,
+    "ccaa": "País Vasco",
+    "poblacion": 2219001
+  },
+  {
+    "anio": 2022,
+    "ccaa": "La Rioja",
+    "poblacion": 322294
+  },
+  {
+    "anio": 2022,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 5216018
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Andalucía",
+    "poblacion": 8632107
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Aragón",
+    "poblacion": 1350115
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Asturias",
+    "poblacion": 1009591
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Cantabria",
+    "poblacion": 591255
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Ceuta",
+    "poblacion": 83245
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Castilla y León",
+    "poblacion": 2391228
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2102109
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Canarias",
+    "poblacion": 2239413
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Cataluña",
+    "poblacion": 8023241
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Extremadura",
+    "poblacion": 1053679
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Galicia",
+    "poblacion": 2706435
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1232586
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1570190
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 7004414
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Melilla",
+    "poblacion": 85815
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Navarra",
+    "poblacion": 678339
+  },
+  {
+    "anio": 2023,
+    "ccaa": "País Vasco",
+    "poblacion": 2228092
+  },
+  {
+    "anio": 2023,
+    "ccaa": "La Rioja",
+    "poblacion": 324053
+  },
+  {
+    "anio": 2023,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 5322349
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Andalucía",
+    "poblacion": 8675885
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Aragón",
+    "poblacion": 1353555
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Asturias",
+    "poblacion": 1014203
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Cantabria",
+    "poblacion": 593370
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Ceuta",
+    "poblacion": 83541
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Castilla y León",
+    "poblacion": 2399705
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2122362
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Canarias",
+    "poblacion": 2258074
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Cataluña",
+    "poblacion": 8120645
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Extremadura",
+    "poblacion": 1053140
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Galicia",
+    "poblacion": 2715642
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1244917
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1585452
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 7122776
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Melilla",
+    "poblacion": 86894
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Navarra",
+    "poblacion": 683429
+  },
+  {
+    "anio": 2024,
+    "ccaa": "País Vasco",
+    "poblacion": 2240156
+  },
+  {
+    "anio": 2024,
+    "ccaa": "La Rioja",
+    "poblacion": 327076
+  },
+  {
+    "anio": 2024,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 5416055
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Andalucía",
+    "poblacion": 8748692
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Aragón",
+    "poblacion": 1381809
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Asturias",
+    "poblacion": 1021569
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Cantabria",
+    "poblacion": 597067
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Ceuta",
+    "poblacion": 84208
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Castilla y León",
+    "poblacion": 2418632
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Castilla-La Mancha",
+    "poblacion": 2154740
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Canarias",
+    "poblacion": 2275864
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Cataluña",
+    "poblacion": 8201735
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Extremadura",
+    "poblacion": 1055342
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Galicia",
+    "poblacion": 2728034
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Islas Baleares",
+    "poblacion": 1260004
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Región de Murcia",
+    "poblacion": 1605736
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Comunidad de Madrid",
+    "poblacion": 7169262
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Melilla",
+    "poblacion": 86896
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Navarra",
+    "poblacion": 689973
+  },
+  {
+    "anio": 2025,
+    "ccaa": "País Vasco",
+    "poblacion": 2252857
+  },
+  {
+    "anio": 2025,
+    "ccaa": "La Rioja",
+    "poblacion": 329499
+  },
+  {
+    "anio": 2025,
+    "ccaa": "Comunidad Valenciana",
+    "poblacion": 5528180
+  }
+]

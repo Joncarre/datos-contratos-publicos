@@ -61,6 +61,7 @@ npm run dev
 ## Análisis disponibles (marts Gold → `web/public/data/`)
 
 - **`resumen`, `serie_anual`, `territorio`** (CCAA vía NUTS) — totales y evolución, con **composición transparente** (acuerdos marco / a verificar; nada se excluye del total).
+- **`territorio_percapita`** — gasto €/persona por CCAA/año (población INE), para comparar de forma **justa** (Madrid vs Murcia).
 - **`top_contratos`, `top_adjudicatarios`, `top_organos`** — los más grandes, con banderas y enlace a PLACSP.
 - **`anomalias`** — sobrecoste relativo a contratos similares (z robusto por CPV+tipo; **sin umbrales presupuestos**).
 - **`concentracion`** — HHI de adjudicaciones por órgano (sobre nº de contratos, robusto a importes-error).

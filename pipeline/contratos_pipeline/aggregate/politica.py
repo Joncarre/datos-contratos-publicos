@@ -35,10 +35,12 @@ _NUTS_NAMES = [
 ]
 _NORM_TO_NUTS = {_norm(n): n for n in _NUTS_NAMES}
 
-# El JSON usa alguna grafía distinta a la oficial NUTS.
+# Los JSON usan alguna grafía distinta a la oficial NUTS.
 _ALIAS = {
     "islas baleares": "Illes Balears",
     "comunidad valenciana": "Comunitat Valenciana",
+    "asturias": "Principado de Asturias",
+    "navarra": "Comunidad Foral de Navarra",
 }
 
 
@@ -76,6 +78,27 @@ def load_dim_alineacion() -> tuple[list[dict[str, Any]], set[str]]:
                 "partido_central": pc,
                 "alineado": (partido == pc) if pc is not None else None,
             })
+    return rows, unmapped
+
+
+def load_poblacion() -> tuple[list[dict[str, Any]], set[str]]:
+    """Filas (ccaa, year, poblacion) desde el JSON del INE. 2026 = 2025 (aún sin dato del año)."""
+    path = config.data_root() / "poblacion_ccaa" / "poblacion_total.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    rows: list[dict[str, Any]] = []
+    unmapped: set[str] = set()
+    pob_2025: dict[str, int] = {}
+    for d in data:
+        ccaa = _map_ccaa(d["ccaa"])
+        if ccaa is None:
+            unmapped.add(d["ccaa"])
+            continue
+        year, pob = int(d["anio"]), int(d["poblacion"])
+        rows.append({"ccaa": ccaa, "year": year, "poblacion": pob})
+        if year == 2025:
+            pob_2025[ccaa] = pob
+    for ccaa, pob in pob_2025.items():
+        rows.append({"ccaa": ccaa, "year": 2026, "poblacion": pob})
     return rows, unmapped
 
 
@@ -132,9 +155,26 @@ _POLITICA_DID_SQL = """
     ORDER BY s.ccaa, s.era
 """
 
+# Per cápita por CCAA/año: gasto (sin los errores `revisar`) / población. Comparación JUSTA
+# (Madrid maneja más que Murcia). Incluye acuerdos marco (objetividad); excluye solo errores.
+_PERCAPITA_SQL = """
+    WITH t AS (
+        SELECT ccaa, year,
+               sum(CASE WHEN revisar_importe THEN 0 ELSE importe END) AS importe,
+               count(*) AS contratos
+        FROM contratos
+        WHERE ccaa IS NOT NULL AND year BETWEEN 2012 AND 2026
+        GROUP BY ccaa, year
+    )
+    SELECT t.ccaa, t.year, round(t.importe, 2) AS importe, t.contratos,
+           p.poblacion, round(t.importe / nullif(p.poblacion, 0), 2) AS per_capita
+    FROM t LEFT JOIN dim_poblacion p ON p.ccaa = t.ccaa AND p.year = t.year
+    ORDER BY t.ccaa, t.year
+"""
+
 
 def build_politica(con, write_json) -> dict[str, int]:
-    """Registra la dim de alineación y construye los marts políticos. Usa la TEMP TABLE `contratos`."""
+    """Registra las dims (alineación, población) y construye marts políticos y per cápita."""
     import pyarrow as pa
 
     rows, unmapped = load_dim_alineacion()
@@ -142,9 +182,19 @@ def build_politica(con, write_json) -> dict[str, int]:
         print(f"[politica] CCAA del JSON sin mapear a NUTS: {sorted(unmapped)}")
     con.register("dim_alineacion", pa.Table.from_pylist(rows))
 
+    pob, pob_unmapped = load_poblacion()
+    if pob_unmapped:
+        print(f"[poblacion] CCAA sin mapear a NUTS: {sorted(pob_unmapped)}")
+    con.register("dim_poblacion", pa.Table.from_pylist(pob))
+
     gold = config.gold_root()
     counts: dict[str, int] = {}
-    for name, sql in (("politica", _POLITICA_SQL), ("politica_did", _POLITICA_DID_SQL)):
+    marts = (
+        ("politica", _POLITICA_SQL),
+        ("politica_did", _POLITICA_DID_SQL),
+        ("territorio_percapita", _PERCAPITA_SQL),
+    )
+    for name, sql in marts:
         cur = con.execute(sql)
         cols = [d[0] for d in cur.description]
         data = [dict(zip(cols, r)) for r in cur.fetchall()]

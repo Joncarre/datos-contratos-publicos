@@ -5,6 +5,7 @@
 /data/*
 !/data/referencia/
 !/data/partidos_politicos/
+!/data/poblacion_ccaa/
 !/data/README.md
 # Por si alguien crea la carpeta con otro nombre o en subniveles:
 **/contratos_menores/

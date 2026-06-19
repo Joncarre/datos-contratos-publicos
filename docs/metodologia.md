@@ -32,6 +32,9 @@ Los importes altos o atípicos son **señales, no ruido**: el mart `top_contrato
 
 > Cautela: el "importe" mezcla importe adjudicado (cuando existe) y presupuesto de licitación (cuando aún no hay adjudicación). En Fase 2 se separarán "licitado" vs "adjudicado" y se resolverá la identidad de adjudicatarios (mismo NIF, distintas grafías: "FCC MEDIO AMBIENTE, S.A.U." vs "SAU").
 
+### Comparación territorial per cápita
+El gasto por CCAA se ofrece también **per cápita** (€/persona, población INE 2012–2025; 2026 = 2025 al no haber dato aún), porque comparar importes absolutos es engañoso (Madrid maneja más que Murcia por tamaño). Se excluyen los **errores marcados** (`revisar`) para que un dato erróneo no distorsione; se **incluyen** los acuerdos marco (objetividad). **Cautela:** la contratación estatal se registra en la sede del organismo (efecto Madrid), así que normalizar por población **no** elimina ese sesgo estructural — Madrid sigue arriba (€60k/persona vs €12k de Murcia, ~5× en vez de ~22× en absoluto).
+
 ## Indicadores (definición y cautelas)
 
 ### Anomalías de importe (data-driven, relativas a pares)

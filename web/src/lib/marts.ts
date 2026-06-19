@@ -22,6 +22,7 @@ export interface ResumenRow {
 }
 export interface SerieRow { year: number; source: Source; contratos: number; importe: number | null; }
 export interface TerritorioRow { ccaa: string; year: number; source: Source; contratos: number; importe: number | null; }
+export interface TerritorioPercapitaRow { ccaa: string; year: number; importe: number | null; contratos: number; poblacion: number | null; per_capita: number | null; }
 export interface RankRow { nombre: string; id: string; source: Source; contratos: number; importe: number | null; n_acuerdo_marco?: number; }
 export interface ContratoRow {
   id_origen: string | null;
@@ -98,6 +99,7 @@ export interface Marts {
   concentracion: ConcentracionRow[];
   fraccionamiento: FraccionamientoRow[];
   proveedores: ProveedorRow[];
+  territorioPercapita: TerritorioPercapitaRow[];
 }
 
 const BASE = import.meta.env.BASE_URL + "data/";
@@ -119,14 +121,15 @@ export async function loadMarts(): Promise<Marts> {
       getJSON<ContratoRow[]>("top_contratos"),
       getJSON<AnomaliaRow[]>("anomalias"),
     ]);
-  const [concentracion, fraccionamiento, proveedores] = await Promise.all([
+  const [concentracion, fraccionamiento, proveedores, territorioPercapita] = await Promise.all([
     getJSON<ConcentracionRow[]>("concentracion"),
     getJSON<FraccionamientoRow[]>("fraccionamiento"),
     getJSON<ProveedorRow[]>("proveedores"),
+    getJSON<TerritorioPercapitaRow[]>("territorio_percapita"),
   ]);
   return {
     resumen, serie, territorio, adjudicatarios, organos, contratos, anomalias,
-    concentracion, fraccionamiento, proveedores,
+    concentracion, fraccionamiento, proveedores, territorioPercapita,
   };
 }
 

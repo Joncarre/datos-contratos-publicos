@@ -29,6 +29,7 @@ export default function App() {
   const [source, setSource] = useState<Filter>("todas");
   const [period, setPeriod] = useState(PERIODS[0]);
   const [section, setSection] = useState<SectionId>("resumen");
+  const [territorioMode, setTerritorioMode] = useState<"total" | "percapita">("total");
 
   useEffect(() => {
     loadMarts().then(setMarts).catch((e) => setError(String(e.message ?? e)));
@@ -54,6 +55,13 @@ export default function App() {
       .sort((a, b) => b.importe - a.importe);
     const maxCcaa = ccaa[0]?.importe ?? 1;
 
+    // Per cápita (€/persona acumulado) — todas las fuentes, independiente del filtro de fuente.
+    const ccaaPCMap = sumBy(marts.territorioPercapita, (r) => r.ccaa, (r) => r.per_capita);
+    const ccaaPC = [...ccaaPCMap.entries()]
+      .map(([nombre, importe]) => ({ nombre, importe }))
+      .sort((a, b) => b.importe - a.importe);
+    const maxCcaaPC = ccaaPC[0]?.importe ?? 1;
+
     const serieMap = sumBy(inSource(marts.serie), (r) => String(r.year), (r) => r.importe);
     const serie = [...serieMap.entries()]
       .map(([y, importe]) => ({ year: +y, importe }))
@@ -75,7 +83,7 @@ export default function App() {
 
     return {
       totalImporte, totalContratos, totalAdj, amN, amImporte, revN, revImporte,
-      ccaa, maxCcaa, serie, maxSerie, ranking, maxRank,
+      ccaa, maxCcaa, ccaaPC, maxCcaaPC, serie, maxSerie, ranking, maxRank,
       contratos: filt(marts.contratos, 12),
       anomalias: filt(marts.anomalias, 12),
       concentracion: filt(marts.concentracion, 12),
@@ -200,27 +208,40 @@ export default function App() {
           </>
         )}
 
-        {view && section === "territorio" && (
-          <section className="card wide">
-            <div className="card-head"><h3>Gasto por CCAA</h3><span className="meta">importe canónico · CCAA vía NUTS</span></div>
-            <div className="map">
-              {view.ccaa.slice(0, 19).map((c) => {
-                const norm = Math.sqrt(c.importe / view.maxCcaa);
-                const bucket = Math.min(6, Math.max(1, 1 + Math.floor(norm * 5.99)));
-                return (
-                  <div className="cell" key={c.nombre} style={{ background: `var(--seq-${bucket})` }}
-                    title={`${c.nombre}: ${eur(c.importe)}`}>
-                    {CCAA_ABBR[c.nombre] ?? c.nombre.slice(0, 3).toUpperCase()}
-                  </div>
-                );
-              })}
-            </div>
-            {view.ccaa.length === 0 && <p className="meta">Sin territorio asignado en esta selección.</p>}
-            <p className="meta" style={{ marginTop: "var(--sp-3)" }}>
-              Nota: la contratación estatal se registra en la sede del organismo (efecto Madrid). Per cápita pendiente de población INE.
-            </p>
-          </section>
-        )}
+        {view && section === "territorio" && (() => {
+          const pc = territorioMode === "percapita";
+          const data = pc ? view.ccaaPC : view.ccaa;
+          const max = pc ? view.maxCcaaPC : view.maxCcaa;
+          return (
+            <section className="card wide">
+              <div className="card-head">
+                <h3>Gasto por CCAA</h3>
+                <div className="period" role="group" aria-label="Modo territorio">
+                  <button aria-pressed={!pc} onClick={() => setTerritorioMode("total")}>Total</button>
+                  <button aria-pressed={pc} onClick={() => setTerritorioMode("percapita")}>Per cápita</button>
+                </div>
+              </div>
+              <div className="map">
+                {data.slice(0, 19).map((c) => {
+                  const norm = Math.sqrt((c.importe || 0) / max);
+                  const bucket = Math.min(6, Math.max(1, 1 + Math.floor(norm * 5.99)));
+                  return (
+                    <div className="cell" key={c.nombre} style={{ background: `var(--seq-${bucket})` }}
+                      title={`${c.nombre}: ${eur(c.importe)}${pc ? " /persona" : ""}`}>
+                      {CCAA_ABBR[c.nombre] ?? c.nombre.slice(0, 3).toUpperCase()}
+                    </div>
+                  );
+                })}
+              </div>
+              {data.length === 0 && <p className="meta">Sin territorio asignado.</p>}
+              <p className="meta" style={{ marginTop: "var(--sp-3)" }}>
+                {pc
+                  ? "€/persona acumulado 2012–2026 (población INE). Excluye errores marcados; incluye acuerdos marco. La contratación estatal aún pesa hacia Madrid (efecto sede)."
+                  : "Importe total. La contratación estatal se registra en la sede del organismo (efecto Madrid)."}
+              </p>
+            </section>
+          );
+        })()}
 
         {view && section === "proveedores" && (
           <>
