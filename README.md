@@ -7,11 +7,13 @@ Plataforma de **visualización y análisis de contratación pública en España*
 ## Arquitectura (medallion)
 
 ```
-ATOM/XML (137 GB)  ──►  BRONZE  ──►  SILVER  ──►  GOLD (marts)  ──►  web/public/data
-   data/*               crudo fiel    canónico +    agregados        Parquet/JSON
-                        + hash/log    dedup         precalculados    (pocos MB)
-[Python + lxml streaming]      [mapeos versionados]   [DuckDB SQL]    [React + TS]
+ATOM/XML (137 GB)  ──►  BRONZE (Parquet)  ──►  GOLD (marts)        ──►  web/public/data
+   data/*               ~38 cols tipadas       dedup canónico +         JSON (KB)
+                        + compactación         análisis (DuckDB)        React + TS
+[Python + lxml streaming]   [idempotente/hash]   [SQL sobre 9,25M filas]
 ```
+
+Flujo: `ingest` (ATOM → Bronze por fichero) → `compact` (miles de Parquet → 1 por fuente) → `marts` (dedup + análisis → JSON). La capa "Silver" (normalización/dedup) vive integrada en el paso `marts` (DuckDB), no como materialización aparte.
 
 - **Ingestión / procesamiento (`pipeline/`)** — Python 3.11+, `lxml` (streaming), DuckDB, Parquet.
 - **Presentación (`web/`)** — React + TypeScript + Vite. Solo lee los *marts* agregados.
@@ -33,15 +35,16 @@ docs/       Metodología, diccionario de datos y decisiones de arquitectura (ADR
 ```bash
 py -m venv .venv
 .venv/Scripts/python -m pip install -e "./pipeline[dev]"
+.venv/Scripts/python -m pytest pipeline -q          # tests del parser
 
-# Verificar el parser con el fixture sintético
-.venv/Scripts/python -m pytest pipeline -q
+# Flujo completo de datos (idempotente: reprocesa solo lo nuevo)
+.venv/Scripts/python -m contratos_pipeline ingest contratos_menores   # idem: perfil_contratante, agregaciones, encargos
+.venv/Scripts/python -m contratos_pipeline compact                    # consolida miles de Parquet -> 1 por fuente (rebuild rápido)
+.venv/Scripts/python -m contratos_pipeline marts                      # dedup + análisis -> web/public/data/*.json
 
-# Inspeccionar un fichero ATOM real (cuando tengas muestras)
-.venv/Scripts/python -m contratos_pipeline parse-file "data/contratos_menores/<fichero>.atom" --limit 3
-
-# Ingestar una fuente completa a Bronze (Parquet)
-.venv/Scripts/python -m contratos_pipeline ingest contratos_menores
+# Utilidades
+.venv/Scripts/python -m contratos_pipeline info                       # rutas y fuentes
+.venv/Scripts/python -m contratos_pipeline parse-file "ruta.atom" --limit 3
 ```
 
 ### 2. Web (React)
@@ -53,7 +56,16 @@ npm run dev
 
 ## Estado
 
-**Fase 0 — Validación del concepto.** Esqueleto del monorepo, parser ATOM por streaming verificado, shell de UI premium. Pendiente: ejecutar el parser contra **muestras reales** para fijar el mapeo canónico (ver `docs/diccionario-datos.md`).
+**Fase 2 — análisis avanzado.** Histórico completo 2012–2026 ingerido: **≈9,25 M filas crudas → 1,95 M expedientes canónicos** (dedup por `(fuente, órgano, expediente)`, estado más reciente), **0 errores**. Bronze compactado → rebuild de marts en ~72 s. Web con datos reales.
+
+## Análisis disponibles (marts Gold → `web/public/data/`)
+
+- **`resumen`, `serie_anual`, `territorio`** (CCAA vía NUTS) — totales y evolución, con **composición transparente** (acuerdos marco / a verificar; nada se excluye del total).
+- **`top_contratos`, `top_adjudicatarios`, `top_organos`** — los más grandes, con banderas y enlace a PLACSP.
+- **`anomalias`** — sobrecoste relativo a contratos similares (z robusto por CPV+tipo; **sin umbrales presupuestos**).
+- **`concentracion`** — HHI de adjudicaciones por órgano (sobre nº de contratos, robusto a importes-error).
+- **`fraccionamiento`** — contratos menores pegados al **umbral legal** (15k/40k €), por órgano-proveedor.
+- **`politica`, `politica_did`** — alineación CCAA↔gobierno central. **Exploratorio, NO concluyente** (efecto sede de Madrid; ver metodología).
 
 ## Datos: ¿dónde van?
 
