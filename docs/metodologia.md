@@ -43,14 +43,15 @@ Para cada contrato se compara su importe con el de **contratos similares** (mism
 ### Importes bajo umbral
 Distribución de importes de contratos menores respecto a los **umbrales legales** (`dim_umbral`). Una acumulación justo por debajo del umbral es un patrón llamativo. **Cautela:** muchos servicios cuestan legítimamente cerca del umbral; es señal, no prueba.
 
-### Alineación política (exploratorio)
-Compara la contratación **estatal** territorializada por CCAA según la **alineación** entre el partido del gobierno central y el de la presidencia autonómica, usando el cambio de gobierno de 2019 como corte (diferencia-en-diferencias).
+### Alineación política (exploratorio — con limitaciones graves, NO concluyente)
+Compara la contratación **estatal** (`organo_nivel = 'estatal'`, Administración General del Estado) territorializada por CCAA según la **alineación** del partido del gobierno central con el de la presidencia autonómica.
 
-**Cautelas críticas:**
-- Normalizar **siempre** (per cápita y % del total nacional); nunca importes absolutos.
-- Separar nivel `estatal` vs `autonomico`: el gasto autonómico lo decide cada CCAA, no el central.
-- Declarar confusores: población, PIB, competencias transferidas, inversión heredada.
-- Presentar como **pregunta abierta**, no como conclusión.
+**Hallazgo empírico (2026-06, datos 2012–2026) — por qué NO se puede concluir:**
+- **Efecto sede (Madrid-HQ):** Madrid concentra el **75,4 %** de toda la contratación estatal con CCAA asignada, porque los organismos del Estado tienen su sede en Madrid y `RealizedLocation` recoge la sede, no dónde llega el beneficio. Madrid sale 71–98 % **todos los años**, gobierne quien gobierne.
+- **Artefacto temporal:** la diferencia aparente "no alineadas 9,3 % vs alineadas 5,1 %" se debe a que Madrid está *no alineada* justo en 2019–2026, cuando existen casi todos los datos (2023: 28.610 contratos estatales con CCAA; 2017: 58). Mide *cuándo hay datos y dónde está la sede*, no política.
+- **Ruido en CCAA pequeñas:** un único macrocontrato dispara su cuota (Canarias 68 %→4 %, Cataluña 50 %→2 %).
+
+**Conclusión:** con estos datos **no se puede afirmar** que la alineación influya en la contratación estatal. Presentarlo como hallazgo sería falso. Para un análisis válido haría falta: (1) resolver el efecto sede (la contratación estatal es HQ-céntrica por diseño — posible limitación estructural insalvable con este dato); (2) normalizar per cápita/PIB (falta `dim_poblacion`); (3) medidas robustas a macrocontratos; (4) suficientes datos por CCAA y era. El módulo se conserva como **infraestructura exploratoria con estos avisos**, nunca como conclusión.
 
 ## Derecho de corrección
 Se habilitará una vía de contacto para que cualquier entidad señale errores. Un dato erróneo defendido sin revisión destruye la credibilidad del proyecto.

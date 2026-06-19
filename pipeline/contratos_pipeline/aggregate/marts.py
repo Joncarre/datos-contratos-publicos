@@ -67,7 +67,19 @@ def _setup_views_sql() -> list[str]:
             -- el techo de 1.307.568 M de GMV. NO define "lo normal" (de eso se ocupa el score de
             -- anomalías, data-driven). Solo se MARCA; jamás se borra ni se excluye.
             (COALESCE(importe_adjudicado, importe_total_con_iva, sum_importe, importe_sin_iva)
-                 > 1e11) AS revisar_importe
+                 > 1e11) AS revisar_importe,
+            -- Nivel del órgano, derivado de la jerarquía administrativa REAL (sin presuponer
+            -- textos; categorías observadas en los datos). ESTATAL = lo que decide el gobierno
+            -- central, clave para el módulo político.
+            CASE
+                WHEN strip_accents(upper(coalesce(admin_hierarchy, '')))
+                     LIKE '%ADMINISTRACION GENERAL DEL ESTADO%' THEN 'estatal'
+                WHEN strip_accents(upper(coalesce(admin_hierarchy, '')))
+                     LIKE '%COMUNIDADES%AUTONOMAS%' THEN 'autonomico'
+                WHEN strip_accents(upper(coalesce(admin_hierarchy, '')))
+                     LIKE '%ENTIDADES LOCALES%' THEN 'local'
+                ELSE 'otro'
+            END AS organo_nivel
         FROM read_parquet('{bronze_glob}', union_by_name = true)
         """,
         # Registro canónico: 1 fila por (fuente, órgano, expediente), el estado más reciente.
@@ -201,4 +213,9 @@ def build_marts() -> dict[str, int]:
         parquet_path = (gold / f"{name}.parquet").as_posix()
         con.execute(f"COPY ({sql}) TO '{parquet_path}' (FORMAT PARQUET)")
         counts[name] = len(rows)
+
+    # Módulo político (usa la TEMP TABLE `contratos`, que ya incluye organo_nivel).
+    from contratos_pipeline.aggregate import politica
+
+    counts.update(politica.build_politica(con, _write_json))
     return counts
