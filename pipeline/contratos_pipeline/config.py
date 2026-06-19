@@ -24,6 +24,19 @@ def bronze_root() -> Path:
     return processed_root() / "_bronze"
 
 
+def bronze_compact_root() -> Path:
+    """Bronze compactado: 1 Parquet por fuente (lectura mucho más rápida que miles de ficheros)."""
+    return processed_root() / "_bronze_compact"
+
+
+def bronze_glob() -> str:
+    """Glob de lectura del Bronze. Prefiere el compactado si existe; si no, los Parquet por fichero."""
+    compact = bronze_compact_root()
+    if compact.exists() and any(compact.glob("*.parquet")):
+        return (compact / "*.parquet").as_posix()
+    return (bronze_root() / "*" / "*.parquet").as_posix()
+
+
 def gold_root() -> Path:
     return processed_root() / "_gold"
 

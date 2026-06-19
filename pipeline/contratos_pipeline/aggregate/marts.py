@@ -41,7 +41,7 @@ def _ccaa_case() -> str:
 
 
 def _setup_views_sql() -> list[str]:
-    bronze_glob = (config.bronze_root() / "*" / "*.parquet").as_posix()
+    bronze_glob = config.bronze_glob()  # usa el compactado si existe (lectura rápida)
     return [
         # Vista base con columnas derivadas.
         f"""

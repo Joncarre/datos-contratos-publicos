@@ -99,6 +99,33 @@ def marts() -> None:
     console.print(f"Destino: {config.web_data_dir()}")
 
 
+@app.command()
+def compact() -> None:
+    """Compacta el Bronze (miles de Parquet diminutos -> 1 por fuente) para acelerar los marts."""
+    import duckdb
+
+    con = duckdb.connect()
+    con.execute("SET enable_progress_bar = false")
+    out = config.bronze_compact_root()
+    out.mkdir(parents=True, exist_ok=True)
+    total = 0
+    for src in config.SOURCES:
+        src_dir = config.bronze_root() / src
+        files = list(src_dir.glob("*.parquet")) if src_dir.exists() else []
+        if not files:
+            continue
+        src_glob = (src_dir / "*.parquet").as_posix()
+        target = (out / f"{src}.parquet").as_posix()
+        con.execute(
+            f"COPY (SELECT * FROM read_parquet('{src_glob}', union_by_name=true)) "
+            f"TO '{target}' (FORMAT PARQUET, COMPRESSION zstd)"
+        )
+        n = con.execute(f"SELECT count(*) FROM read_parquet('{target}')").fetchone()[0]
+        total += n
+        console.print(f"  [bold green]{src}[/]: {len(files)} ficheros -> 1 ({n:,} filas)")
+    console.print(f"Bronze compactado en {out} · {total:,} filas. Los marts ya lo usarán.")
+
+
 def main() -> None:
     app()
 
