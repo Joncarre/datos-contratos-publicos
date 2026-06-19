@@ -12,7 +12,7 @@ import {
 } from "./lib/marts";
 
 type Filter = Source | "todas";
-type SectionId = "resumen" | "territorio" | "proveedores" | "patrones";
+type SectionId = "resumen" | "territorio" | "proveedores" | "patrones" | "metodologia";
 
 const SOURCES: Source[] = ["contratos_menores", "perfil_contratante", "agregaciones", "encargos"];
 const PERIODS = ["2012–2026", "2018–2026", "2022–2026"];
@@ -21,6 +21,7 @@ const SECTIONS: { id: SectionId; label: string; sub: string }[] = [
   { id: "territorio", label: "Territorio", sub: "gasto por comunidad autónoma" },
   { id: "proveedores", label: "Proveedores", sub: "recurrentes, dependencia y concentración" },
   { id: "patrones", label: "Patrones llamativos", sub: "contratos grandes, anomalías, fraccionamiento" },
+  { id: "metodologia", label: "Cómo leer esto", sub: "metodología y cautelas" },
 ];
 
 export default function App() {
@@ -343,6 +344,34 @@ export default function App() {
                       {f.organo_nombre} → {f.adjudicatario_nombre}
                       <span className="muted"> · {eur(f.importe_cerca)} de {num(f.n_menores_total)} menores</span>
                     </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
+        {view && section === "metodologia" && (
+          <>
+            <section className="card wide">
+              <div className="card-head"><h3>Cómo leer estos datos</h3><span className="meta">presentación responsable</span></div>
+              <div className="prose">
+                <p><strong>Señales, no acusaciones.</strong> Concentración, anomalías o fraccionamiento son patrones para <em>investigar</em>, no pruebas. Correlación no implica causalidad.</p>
+                <p><strong>Expediente canónico.</strong> Los feeds republican cada contrato en cada cambio de estado; nos quedamos con una fila por (fuente, órgano, expediente), la más reciente. Sin esto, los importes se multiplican (perfil ×3,6).</p>
+                <p><strong>Importes: nada se oculta.</strong> El total incluye todo. Los <span className="tag tag-am">acuerdo marco</span> son techos (no gasto ejecutado). Los importes físicamente imposibles (p. ej. €200 B a una persona) se marcan <span className="tag tag-rev">a verificar</span>, jamás se borran.</p>
+                <p><strong>Anomalías sin prejuicios.</strong> No fijamos qué es "normal": cada contrato se compara con sus <em>similares</em> (CPV + tipo) y la propia distribución decide qué es atípico.</p>
+                <p><strong>Per cápita.</strong> Población INE para comparar de forma justa. Aun así, la contratación estatal se registra en la sede del organismo (efecto Madrid), que la normalización no elimina.</p>
+              </div>
+            </section>
+
+            <section className="card wide">
+              <div className="card-head"><h3>Cobertura por fuente</h3><span className="meta">desde qué año hay datos</span></div>
+              <div className="biglist">
+                {SOURCES.map((s) => (
+                  <div className="big-row" key={s}>
+                    <span className="amount">{SOURCE_COVERAGE[s]}</span>
+                    <span className="tags" />
+                    <span className="name">{SOURCE_LABEL[s]}</span>
                   </div>
                 ))}
               </div>

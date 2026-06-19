@@ -449,6 +449,18 @@ button {
   letter-spacing: -0.02em;
 }
 
+/* Prosa (sección metodología) */
+.prose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  max-width: 72ch;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+.prose strong { color: var(--ink); font-weight: 600; }
+.prose .tag { display: inline-block; vertical-align: baseline; }
+
 @keyframes fadeUp {
   from {
     opacity: 0;
