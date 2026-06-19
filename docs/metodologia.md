@@ -34,6 +34,9 @@ Los importes altos o atípicos son **señales, no ruido**: el mart `top_contrato
 
 ## Indicadores (definición y cautelas)
 
+### Anomalías de importe (data-driven, relativas a pares)
+Para cada contrato se compara su importe con el de **contratos similares** (misma división CPV + tipo de contrato) mediante un **z robusto**: `score = (ln(importe) − mediana_pares) / (1,4826 · MAD_pares)`. El signo indica + (mucho más caro que sus pares) o − (mucho más barato). **No se presupone ningún umbral absoluto de "normal"**: es la propia distribución de cada grupo la que define qué es atípico. Requiere ≥ 30 pares para ser fiable. Es **descriptivo, no concluyente**: ordena por rareza e invita a investigar (con enlace a PLACSP), nunca afirma irregularidad. Así afloran tanto el error de Santiago como, p. ej., los €4.827 M en "caminos municipales", sin que nadie haya decidido a mano que son anómalos.
+
 ### Concentración de proveedores (HHI)
 Índice Herfindahl-Hirschman sobre la cuota de importe por adjudicatario dentro de un órgano/territorio. Alto = pocos proveedores acaparan. **Cautela:** mercados pequeños o especializados concentran de forma legítima.
 

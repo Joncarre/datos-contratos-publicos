@@ -38,6 +38,24 @@ export interface ContratoRow {
   link_detalle: string | null;
 }
 
+export interface AnomaliaRow {
+  id_origen: string | null;
+  source: Source;
+  year: number | null;
+  ccaa: string | null;
+  objeto: string | null;
+  organo_nombre: string | null;
+  adjudicatario_nombre: string | null;
+  importe: number | null;
+  cpv: string | null;
+  peer: string;
+  peers: number;
+  es_acuerdo_marco: boolean;
+  importe_mediano_peer: number | null;
+  score: number | null;
+  link_detalle: string | null;
+}
+
 export interface Marts {
   resumen: ResumenRow[];
   serie: SerieRow[];
@@ -45,6 +63,7 @@ export interface Marts {
   adjudicatarios: RankRow[];
   organos: RankRow[];
   contratos: ContratoRow[];
+  anomalias: AnomaliaRow[];
 }
 
 const BASE = import.meta.env.BASE_URL + "data/";
@@ -56,15 +75,17 @@ async function getJSON<T>(name: string): Promise<T> {
 }
 
 export async function loadMarts(): Promise<Marts> {
-  const [resumen, serie, territorio, adjudicatarios, organos, contratos] = await Promise.all([
-    getJSON<ResumenRow[]>("resumen"),
-    getJSON<SerieRow[]>("serie_anual"),
-    getJSON<TerritorioRow[]>("territorio"),
-    getJSON<RankRow[]>("top_adjudicatarios"),
-    getJSON<RankRow[]>("top_organos"),
-    getJSON<ContratoRow[]>("top_contratos"),
-  ]);
-  return { resumen, serie, territorio, adjudicatarios, organos, contratos };
+  const [resumen, serie, territorio, adjudicatarios, organos, contratos, anomalias] =
+    await Promise.all([
+      getJSON<ResumenRow[]>("resumen"),
+      getJSON<SerieRow[]>("serie_anual"),
+      getJSON<TerritorioRow[]>("territorio"),
+      getJSON<RankRow[]>("top_adjudicatarios"),
+      getJSON<RankRow[]>("top_organos"),
+      getJSON<ContratoRow[]>("top_contratos"),
+      getJSON<AnomaliaRow[]>("anomalias"),
+    ]);
+  return { resumen, serie, territorio, adjudicatarios, organos, contratos, anomalias };
 }
 
 export const SOURCE_LABEL: Record<Source, string> = {

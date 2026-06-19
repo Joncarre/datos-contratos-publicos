@@ -374,6 +374,7 @@ button {
 .tag-rev { color: var(--warn); background: var(--warn-soft); border: 1px solid #efd9b8; }
 .ext { color: var(--ink-3); text-decoration: none; }
 .ext:hover { color: var(--accent); }
+.muted { color: var(--ink-3); }
 
 @keyframes fadeUp {
   from {

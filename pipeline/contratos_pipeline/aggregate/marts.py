@@ -62,17 +62,19 @@ def _setup_views_sql() -> list[str]:
             -- para que el usuario pueda interpretar/filtrar y para destacar lo llamativo.
             (lower(coalesce(objeto, '')) LIKE '%acuerdo marco%') AS es_acuerdo_marco,
             (upper(estado) = 'ANUL') AS es_anulada,
-            -- Marca PROVISIONAL de revisión SOLO para imposibilidades físicas evidentes (un único
-            -- contrato > ~10.000 M y no acuerdo marco; p. ej. el error de ~1/8 del PIB). NO define
-            -- "lo normal": la detección real de anomalías (Fase 2) será data-driven y relativa a
-            -- pares (CPV/tipo/territorio). Aquí solo se MARCA; jamás se borra ni se excluye.
-            (COALESCE(importe_adjudicado, importe_total_con_iva, sum_importe, importe_sin_iva) > 1e10
-             AND lower(coalesce(objeto, '')) NOT LIKE '%acuerdo marco%') AS revisar_importe
+            -- Marca de revisión SOLO para magnitudes FÍSICAMENTE IMPOSIBLES en un único contrato
+            -- (> 100.000 M ≈ >6% del PIB), incluidos acuerdos marco: p. ej. Santiago (200.000 M) y
+            -- el techo de 1.307.568 M de GMV. NO define "lo normal" (de eso se ocupa el score de
+            -- anomalías, data-driven). Solo se MARCA; jamás se borra ni se excluye.
+            (COALESCE(importe_adjudicado, importe_total_con_iva, sum_importe, importe_sin_iva)
+                 > 1e11) AS revisar_importe
         FROM read_parquet('{bronze_glob}', union_by_name = true)
         """,
         # Registro canónico: 1 fila por (fuente, órgano, expediente), el estado más reciente.
+        # TEMP TABLE (no VIEW): materializa el dedup UNA vez; si fuera vista se recalcularía en
+        # cada mart y en cada paso de la query de anomalías (deduplicar 9M filas decenas de veces).
         """
-        CREATE OR REPLACE VIEW contratos AS
+        CREATE OR REPLACE TEMP TABLE contratos AS
         SELECT * EXCLUDE (_rn) FROM (
             SELECT *, row_number() OVER (
                 PARTITION BY source, org_key, id_origen
@@ -147,6 +149,35 @@ _MARTS: dict[str, str] = {
                es_acuerdo_marco, revisar_importe, link_detalle
         FROM contratos WHERE importe IS NOT NULL
         ORDER BY importe DESC LIMIT 150
+    """,
+    # Anomalías de importe DATA-DRIVEN: no se presupone qué es "normal". Para cada contrato se
+    # compara su log-importe con el de sus PARES (división CPV + tipo) mediante un z robusto (MAD).
+    # `score` = nº de desviaciones robustas respecto a la mediana de pares (signo: + caro / - barato).
+    # Solo descriptivo: se ordena por rareza y se MUESTRA; no hay umbral absoluto ni se descarta nada.
+    "anomalias": """
+        WITH c AS (
+            SELECT id_origen, source, year, ccaa, objeto, organo_nombre, adjudicatario_nombre,
+                   importe, cpv, tipo_contrato, es_acuerdo_marco, link_detalle,
+                   coalesce(substr(cpv, 1, 2), 'NA') || '|' || coalesce(tipo_contrato, 'NA') AS peer,
+                   ln(importe) AS limp
+            FROM contratos WHERE importe > 0
+        ),
+        -- median() + mad() en UNA pasada (mad = mediana de |x - mediana|); robusto a outliers.
+        stats AS (SELECT peer, median(limp) AS med, mad(limp) AS madv, count(*) AS n
+                  FROM c GROUP BY peer)
+        SELECT c.id_origen, c.source, c.year, c.ccaa, substr(c.objeto, 1, 120) AS objeto,
+               c.organo_nombre, c.adjudicatario_nombre, round(c.importe, 2) AS importe,
+               c.cpv, c.peer, s.n AS peers, c.es_acuerdo_marco,
+               round(exp(s.med), 2) AS importe_mediano_peer,
+               round((c.limp - s.med) / (1.4826 * s.madv), 2) AS score,
+               c.link_detalle
+        FROM c JOIN stats s USING (peer)
+        WHERE s.n >= 30 AND s.madv > 0
+        -- Orden por sobrecoste relativo (score DESC): primero lo MUCHO más caro que sus similares,
+        -- que es la señal investigativa. Los de signo negativo (anormalmente baratos) también
+        -- existen en los datos; se podrán explorar en una vista simétrica. Nada se descarta.
+        ORDER BY (c.limp - s.med) / (1.4826 * s.madv) DESC NULLS LAST
+        LIMIT 200
     """,
 }
 

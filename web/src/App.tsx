@@ -64,10 +64,13 @@ export default function App() {
     const contratos = (source === "todas"
       ? marts.contratos
       : marts.contratos.filter((c) => c.source === source)).slice(0, 12);
+    const anomalias = (source === "todas"
+      ? marts.anomalias
+      : marts.anomalias.filter((a) => a.source === source)).slice(0, 12);
 
     return {
       totalImporte, totalContratos, totalAdj, ccaa, maxCcaa, serie, maxSerie, ranking, maxRank,
-      amN, amImporte, revN, revImporte, contratos,
+      amN, amImporte, revN, revImporte, contratos, anomalias,
     };
   }, [marts, source]);
 
@@ -220,6 +223,32 @@ export default function App() {
                     )}
                   </div>
                 ))}
+              </div>
+            </section>
+
+            <section className="card wide">
+              <div className="card-head">
+                <h3>Anomalías de importe</h3>
+                <span className="meta">vs contratos similares (CPV + tipo) · score robusto · descriptivo, no concluyente</span>
+              </div>
+              <div className="biglist">
+                {view.anomalias.map((a, i) => (
+                  <div className="big-row" key={(a.id_origen ?? "") + i}>
+                    <span className="amount">{eur(a.importe)}</span>
+                    <span className="tags">
+                      <span className="tag tag-rev">×{a.score} σ</span>
+                      {a.es_acuerdo_marco && <span className="tag tag-am">acuerdo marco</span>}
+                    </span>
+                    <span className="name" title={a.objeto ?? ""}>
+                      {a.adjudicatario_nombre || a.organo_nombre || a.objeto || "—"}
+                      <span className="muted"> · mediana similares {eur(a.importe_mediano_peer)} ({num(a.peers)} pares)</span>
+                    </span>
+                    {a.link_detalle && (
+                      <a className="ext" href={a.link_detalle} target="_blank" rel="noreferrer" title="Ver en PLACSP">↗</a>
+                    )}
+                  </div>
+                ))}
+                {view.anomalias.length === 0 && <p className="meta">Aún sin marts de anomalías (ejecuta `marts`).</p>}
               </div>
             </section>
           </>
