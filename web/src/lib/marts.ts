@@ -91,6 +91,24 @@ export interface ProveedorRow {
   pct_top_organo: number | null;
 }
 
+export interface PoliticaRow {
+  ccaa: string;
+  year: number;
+  partido_ccaa: string | null;
+  partido_central: string | null;
+  alineado: boolean | null;
+  contratos: number;
+  importe: number | null;
+  pct_importe_nac: number | null;
+  pct_contratos_nac: number | null;
+}
+export interface PoliticaDidRow {
+  ccaa: string;
+  era: string;
+  pct_importe_medio: number | null;
+  frac_anios_alineada: number | null;
+}
+
 export interface Marts {
   resumen: ResumenRow[];
   resumenPeriodos: ResumenPeriodoRow[];
@@ -104,6 +122,8 @@ export interface Marts {
   fraccionamiento: FraccionamientoRow[];
   proveedores: ProveedorRow[];
   territorioPercapita: TerritorioPercapitaRow[];
+  politica: PoliticaRow[];
+  politicaDid: PoliticaDidRow[];
 }
 
 const BASE = import.meta.env.BASE_URL + "data/";
@@ -133,9 +153,13 @@ export async function loadMarts(): Promise<Marts> {
       getJSON<TerritorioPercapitaRow[]>("territorio_percapita"),
       getJSON<ResumenPeriodoRow[]>("resumen_periodos"),
     ]);
+  const [politica, politicaDid] = await Promise.all([
+    getJSON<PoliticaRow[]>("politica"),
+    getJSON<PoliticaDidRow[]>("politica_did"),
+  ]);
   return {
     resumen, resumenPeriodos, serie, territorio, adjudicatarios, organos, contratos, anomalias,
-    concentracion, fraccionamiento, proveedores, territorioPercapita,
+    concentracion, fraccionamiento, proveedores, territorioPercapita, politica, politicaDid,
   };
 }
 

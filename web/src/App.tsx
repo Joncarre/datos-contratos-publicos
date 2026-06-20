@@ -14,7 +14,7 @@ import { SpainMap } from "./SpainMap";
 const Investigar = lazy(() => import("./Investigar"));
 
 type Filter = Source | "todas";
-type SectionId = "resumen" | "investigar" | "territorio" | "proveedores" | "patrones" | "metodologia";
+type SectionId = "resumen" | "investigar" | "territorio" | "proveedores" | "patrones" | "politica" | "metodologia";
 
 const SOURCES: Source[] = ["contratos_menores", "perfil_contratante", "agregaciones", "encargos"];
 const PERIODS = ["2012–2026", "2018–2026", "2022–2026"];
@@ -24,6 +24,7 @@ const SECTIONS: { id: SectionId; label: string; sub: string }[] = [
   { id: "territorio", label: "Territorio", sub: "gasto por comunidad autónoma" },
   { id: "proveedores", label: "Proveedores", sub: "recurrentes, dependencia y concentración" },
   { id: "patrones", label: "Patrones llamativos", sub: "contratos grandes, anomalías, fraccionamiento" },
+  { id: "politica", label: "Política", sub: "alineación partidista y gasto estatal" },
   { id: "metodologia", label: "Cómo leer esto", sub: "metodología y cautelas" },
 ];
 
@@ -110,6 +111,31 @@ export default function App() {
       fraccionamiento: marts.fraccionamiento.slice(0, 12),
     };
   }, [marts, source, period]);
+
+  const politicaView = useMemo(() => {
+    if (!marts) return null;
+    const central = new Map<number, string>();
+    for (const r of marts.politica) if (r.partido_central) central.set(r.year, r.partido_central);
+    const timeline = [...central.entries()].sort((a, b) => a[0] - b[0]).map(([year, partido]) => ({ year, partido }));
+
+    const madMad = marts.politica.filter((r) => r.ccaa === "Comunidad de Madrid" && r.year >= 2019 && r.pct_importe_nac != null);
+    const madridShare = madMad.length ? madMad.reduce((a, r) => a + (r.pct_importe_nac ?? 0), 0) / madMad.length : 0;
+
+    const byCcaa = new Map<string, { pp: number; psoe: number; frac: number }>();
+    for (const r of marts.politicaDid) {
+      const cur = byCcaa.get(r.ccaa) ?? { pp: 0, psoe: 0, frac: 0 };
+      if (r.era.startsWith("PP")) cur.pp = r.pct_importe_medio ?? 0;
+      else {
+        cur.psoe = r.pct_importe_medio ?? 0;
+        cur.frac = r.frac_anios_alineada ?? 0;
+      }
+      byCcaa.set(r.ccaa, cur);
+    }
+    const did = [...byCcaa.entries()]
+      .map(([ccaa, v]) => ({ ccaa, pp: v.pp, psoe: v.psoe, delta: v.psoe - v.pp, frac: v.frac }))
+      .sort((a, b) => b.psoe - a.psoe);
+    return { timeline, madridShare, did };
+  }, [marts]);
 
   const active = SECTIONS.find((s) => s.id === section)!;
   const sourceLabel = source === "todas" ? "todas las fuentes" : SOURCE_LABEL[source as Source];
@@ -414,6 +440,67 @@ export default function App() {
                     </span>
                   </div>
                 ))}
+              </div>
+            </section>
+          </>
+        )}
+
+        {politicaView && section === "politica" && (
+          <>
+            <section className="card wide">
+              <div className="card-head"><h3>¿Hay favoritismo partidista?</h3><span className="meta"><span className="badge">lectura honesta</span></span></div>
+              <div className="prose">
+                <p><strong>La pregunta tentadora:</strong> ¿reparte el gobierno central la contratación <em>estatal</em> según el color político de cada comunidad? Por ejemplo, ¿el PSOE (desde 2019) dio menos a las CCAA gobernadas por el PP?</p>
+                <p><strong>Respuesta corta: los datos NO lo sostienen.</strong> El obstáculo de fondo es la <em>territorialización</em>: la contratación estatal se registra en la sede del organismo, y <strong>el {politicaView.madridShare.toFixed(0)} % se atribuye a la Comunidad de Madrid</strong> (efecto sede). Eso no mide a quién beneficia el gasto, así que la «cuota por CCAA» es un proxy muy ruidoso.</p>
+                <p>Aun así, comparando el cambio de cuota de cada comunidad entre la era PP (2012–18) y la era PSOE (2019–26): las CCAA gobernadas por el PP <strong>no pierden</strong> cuota de forma sistemática (varias suben, p. ej. Andalucía y Galicia). Los grandes vaivenes (Canarias, Cataluña) son <em>artefactos</em> de unos pocos megacontratos puntuales, no decisiones de reparto. No aparece un patrón partidista limpio en ningún sentido.</p>
+              </div>
+            </section>
+
+            <section className="card wide">
+              <div className="card-head"><h3>Gobierno central por año</h3><span className="meta">el viraje clave: 2019 (PP → PSOE)</span></div>
+              <div className="govts">
+                {politicaView.timeline.map((t) => (
+                  <div key={t.year} className={`govt ${t.partido === "PP" ? "pp" : t.partido === "PSOE" ? "psoe" : "otro"}`}>
+                    <span className="y">{t.year}</span><span className="p">{t.partido}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="card wide">
+              <div className="card-head"><h3>Cuota de contratación estatal por comunidad</h3><span className="meta">era PP vs era PSOE · % del total estatal</span></div>
+              <div className="results-wrap">
+                <table className="results">
+                  <thead><tr><th>comunidad</th><th>era PP<br />2012–18</th><th>era PSOE<br />2019–26</th><th>cambio</th><th>alineación con Moncloa</th></tr></thead>
+                  <tbody>
+                    {politicaView.did.map((d) => {
+                      const sede = d.ccaa === "Comunidad de Madrid";
+                      const arte = !sede && d.pp > 10;
+                      const pc = (n: number) => (n >= 0 ? "" : "−") + Math.abs(n).toFixed(1).replace(".", ",");
+                      return (
+                        <tr key={d.ccaa} className={sede ? "on" : ""}>
+                          <td className="tx">{d.ccaa}{sede && <span className="tag tag-rev"> sede</span>}{arte && <span className="tag tag-am"> artefacto</span>}</td>
+                          <td className="amt">{pc(d.pp)} %</td>
+                          <td className="amt">{pc(d.psoe)} %</td>
+                          <td className="amt">{d.delta >= 0 ? "+" : ""}{pc(d.delta)} pp</td>
+                          <td className="dim">{d.frac >= 0.6 ? "alineada" : d.frac <= 0.4 ? "no alineada" : "mixta"} · {Math.round(d.frac * 100)} %</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <p className="meta" style={{ marginTop: "var(--sp-3)" }}>
+                «Alineación» = coincidencia exacta de partido entre la comunidad y Moncloa (PSC≠PSOE; partidos en crudo). Solo Administración General del Estado. Importes sin errores marcados; incluye acuerdos marco. <strong>Madrid (sede)</strong> y los <strong>artefactos</strong> no son interpretables como reparto.
+              </p>
+            </section>
+
+            <section className="card wide">
+              <div className="card-head"><h3>Por qué no concluimos</h3><span className="meta">objetividad</span></div>
+              <div className="prose">
+                <p><strong>Efecto sede.</strong> El {politicaView.madridShare.toFixed(0)} % del gasto estatal se registra en Madrid; la CCAA del organismo ≠ dónde se ejecuta ni quién se beneficia.</p>
+                <p><strong>Artefactos.</strong> Unos pocos megacontratos mueven la cuota de una comunidad decenas de puntos en un año. Con esa concentración, la «cuota» no es un indicador estable de reparto.</p>
+                <p><strong>Correlación ≠ causalidad.</strong> Aunque hubiera diferencias, podrían deberse a infraestructuras planificadas años antes, a la población o a dónde tienen sede las empresas, no a afinidad política. No afirmamos intención.</p>
               </div>
             </section>
           </>

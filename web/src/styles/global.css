@@ -205,6 +205,46 @@ button.kbd:hover {
   opacity: 0.5;
 }
 
+/* Línea de gobierno central por año (sección Política). Colores de partido para legibilidad. */
+.govts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.govt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  min-width: 54px;
+  font-variant-numeric: tabular-nums;
+}
+.govt .y {
+  font-size: var(--fs-12);
+  color: var(--ink-3);
+}
+.govt .p {
+  font-size: var(--fs-13);
+  font-weight: 500;
+}
+.govt.pp {
+  background: #e8eefb;
+  border-color: #c9d9f3;
+}
+.govt.pp .p {
+  color: #1d4ed8;
+}
+.govt.psoe {
+  background: #fbece9;
+  border-color: #f3cfc9;
+}
+.govt.psoe .p {
+  color: #c0392b;
+}
+
 /* ── Rail (filtros) ──────────────────────────────────────────────────────── */
 .rail {
   grid-area: rail;
