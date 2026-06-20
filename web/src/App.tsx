@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import {
   CCAA_ABBR,
   eur,
@@ -11,13 +11,16 @@ import {
   type Source,
 } from "./lib/marts";
 
+const Investigar = lazy(() => import("./Investigar"));
+
 type Filter = Source | "todas";
-type SectionId = "resumen" | "territorio" | "proveedores" | "patrones" | "metodologia";
+type SectionId = "resumen" | "investigar" | "territorio" | "proveedores" | "patrones" | "metodologia";
 
 const SOURCES: Source[] = ["contratos_menores", "perfil_contratante", "agregaciones", "encargos"];
 const PERIODS = ["2012–2026", "2018–2026", "2022–2026"];
 const SECTIONS: { id: SectionId; label: string; sub: string }[] = [
   { id: "resumen", label: "Resumen", sub: "el panorama y su composición" },
+  { id: "investigar", label: "Investigar", sub: "buscar y filtrar contratos uno a uno" },
   { id: "territorio", label: "Territorio", sub: "gasto por comunidad autónoma" },
   { id: "proveedores", label: "Proveedores", sub: "recurrentes, dependencia y concentración" },
   { id: "patrones", label: "Patrones llamativos", sub: "contratos grandes, anomalías, fraccionamiento" },
@@ -155,7 +158,18 @@ export default function App() {
           <span className="meta">{active.sub} · {period} · {sourceLabel}</span>
         </div>
 
-        {error && (
+        {section === "investigar" && (
+          <Suspense fallback={
+            <section className="card wide">
+              <div className="card-head"><h3>Cargando motor de consulta…</h3></div>
+              <p className="meta">Inicializando DuckDB-WASM en el navegador (la primera vez tarda unos segundos).</p>
+            </section>
+          }>
+            <Investigar />
+          </Suspense>
+        )}
+
+        {section !== "investigar" && error && (
           <section className="card wide">
             <div className="card-head"><h3>Sin datos todavía</h3></div>
             <p className="muted" style={{ lineHeight: 1.6 }}>
@@ -164,7 +178,7 @@ export default function App() {
           </section>
         )}
 
-        {!error && !view && (
+        {section !== "investigar" && !error && !view && (
           <section className="card wide">
             <div className="card-head"><h3>Cargando expediente…</h3></div>
             <div className="spark">{Array.from({ length: 12 }).map((_, i) => (

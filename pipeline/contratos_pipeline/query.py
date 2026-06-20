@@ -46,6 +46,51 @@ def build_file_manifest() -> int:
     return len(rows)
 
 
+def export_web_index() -> int:
+    """Exporta el índice consultable por el navegador (DuckDB-WASM) a web/public/data/contratos.parquet.
+
+    Columnas de investigación (sin `objeto`, para acotar tamaño) + `fichero` (ruta exacta del .atom,
+    horneada uniendo el manifiesto). Row-groups de 100k para *range requests* eficientes.
+    """
+    import duckdb
+
+    silver = silver_path()
+    if not silver.exists():
+        raise FileNotFoundError("No existe la capa Silver. Ejecuta primero: `silver`.")
+    out = config.web_data_dir() / "contratos.parquet"
+    out.parent.mkdir(parents=True, exist_ok=True)
+
+    con = duckdb.connect()
+    con.execute("SET enable_progress_bar = false")
+    man = manifest_path()
+    if man.exists():
+        m = f"read_parquet('{man.as_posix()}')"
+        joins = (
+            f" LEFT JOIN (SELECT source, basename, year_folder, relpath FROM {m}) me "
+            f"   ON me.source = s.source AND me.basename = s.source_file AND me.year_folder = s.year"
+            f" LEFT JOIN (SELECT source, basename, any_value(relpath) AS relpath FROM {m} "
+            f"            GROUP BY source, basename) ma "
+            f"   ON ma.source = s.source AND ma.basename = s.source_file"
+        )
+        fichero = "COALESCE(me.relpath, ma.relpath)"
+    else:
+        joins, fichero = "", "NULL"
+
+    con.execute(f"""
+        COPY (
+            SELECT s.id_origen, s.source, s.source_file, {fichero} AS fichero, s.estado, s.year,
+                   s.organo_nombre, s.organo_nif, s.organo_nivel, s.ccaa,
+                   s.cpv, s.tipo_contrato, s.adjudicatario_nombre, s.adjudicatario_nif,
+                   s.fecha_adjudicacion, s.importe, s.importe_adjudicado,
+                   s.importe_total_con_iva, s.importe_sin_iva,
+                   s.es_acuerdo_marco, s.revisar_importe, s.link_detalle
+            FROM read_parquet('{silver.as_posix()}') s
+            {joins}
+        ) TO '{out.as_posix()}' (FORMAT PARQUET, COMPRESSION zstd, ROW_GROUP_SIZE 100000)
+    """)
+    return con.execute(f"SELECT count(*) FROM read_parquet('{out.as_posix()}')").fetchone()[0]
+
+
 def _load_manifest(con) -> dict[tuple[str, str], list[tuple[int | None, str]]]:
     m = manifest_path()
     if not m.exists():

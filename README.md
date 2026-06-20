@@ -42,6 +42,7 @@ py -m venv .venv
 .venv/Scripts/python -m contratos_pipeline compact                    # consolida miles de Parquet -> 1 por fuente (rebuild rápido)
 .venv/Scripts/python -m contratos_pipeline silver                     # capa canónica CONSULTABLE (5,08M expedientes)
 .venv/Scripts/python -m contratos_pipeline index-files                # índice de ficheros .atom (carpeta/año -> ruta)
+.venv/Scripts/python -m contratos_pipeline web-index                  # índice del navegador (DuckDB-WASM) -> web/public/data/contratos.parquet
 .venv/Scripts/python -m contratos_pipeline marts                      # análisis -> web/public/data/*.json
 
 # Utilidades
@@ -102,6 +103,8 @@ python -m contratos_pipeline stats --ccaa Madrid --year 2023
 ```
 
 `find`/`inspect` muestran el `id_origen`, el adjudicatario/órgano, el importe, las banderas y la **ruta exacta** del `.atom` (p. ej. `placsp/perfil_contratante/2026/licitaciones…_9.atom`), para abrirlo y comprobar el dato. Nota: un mismo `id_origen` puede repetirse entre órganos distintos; ambos se muestran.
+
+**En la web** (folio **Investigar**) lo mismo, pero **en el navegador** con **DuckDB-WASM** sobre `contratos.parquet` (~300 MB, leído por *range requests*, sin backend): filtras los 5,08 M, ves la ficha de cada contrato con su **fichero de origen** y un resumen agregado. Requiere haber ejecutado `web-index` antes de `npm run dev`.
 
 ## Aviso
 

@@ -146,6 +146,17 @@ def index_files() -> None:
     console.print(f"[bold green]Manifiesto[/]: {n:,} ficheros .atom indexados")
 
 
+@app.command("web-index")
+def web_index() -> None:
+    """Exporta el índice consultable por el navegador (DuckDB-WASM) a web/public/data/contratos.parquet."""
+    from contratos_pipeline.query import export_web_index
+
+    console.print("Exportando índice del navegador (puede tardar) ...")
+    n = export_web_index()
+    dest = config.web_data_dir() / "contratos.parquet"
+    console.print(f"[bold green]Índice navegador[/]: {n:,} contratos -> {dest}")
+
+
 def _print_contratos(rows: list) -> None:
     if not rows:
         console.print("[yellow]Sin resultados.[/]")
