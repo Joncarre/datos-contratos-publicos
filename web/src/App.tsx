@@ -54,7 +54,9 @@ export default function App() {
 
     // Resumen EXACTO por periodo: incluye recuentos ÚNICOS (adj_id/org_id), no derivables de la serie.
     const resumen = inSource(marts.resumenPeriodos.filter((r) => parseInt(r.periodo, 10) === desde));
-    const totalImporte = resumen.reduce((a, r) => a + (r.importe ?? 0), 0);
+    // Total LIMPIO: resta los importes físicamente imposibles ya marcados (revisar_importe), que
+    // son erratas de grabación (Santiago, techo GMV). Los acuerdos marco reales SÍ se incluyen.
+    const totalImporte = resumen.reduce((a, r) => a + (r.importe ?? 0) - (r.importe_revisar ?? 0), 0);
     const totalContratos = resumen.reduce((a, r) => a + r.contratos, 0);
     const totalAdj = resumen.reduce((a, r) => a + r.adjudicatarios, 0);
     const amN = resumen.reduce((a, r) => a + (r.n_acuerdo_marco ?? 0), 0);
@@ -233,14 +235,14 @@ export default function App() {
                 <span className="meta"><span className="badge">datos reales</span></span>
               </div>
               <div className="stat-row">
-                <div className="stat"><div className="value">{eur(view.totalImporte)}</div><div className="label">Importe total (todo incluido)</div></div>
+                <div className="stat"><div className="value">{eur(view.totalImporte)}</div><div className="label">Importe total (sin importes erróneos)</div></div>
                 <div className="stat"><div className="value">{num(view.totalContratos)}</div><div className="label">Contratos (deduplicados)</div></div>
                 <div className="stat"><div className="value">{num(view.totalAdj)}</div><div className="label">Adjudicatarios</div></div>
               </div>
               {(view.amN > 0 || view.revN > 0) && (
                 <p className="meta" style={{ marginTop: "var(--sp-3)" }}>
-                  Composición: incluye {num(view.amN)} acuerdos marco ({eur(view.amImporte)} — son techos, no gasto)
-                  {view.revN > 0 && <> · {num(view.revN)} a verificar ({eur(view.revImporte)})</>}. Nada se excluye del total.
+                  Composición: el total incluye {num(view.amN)} acuerdos marco ({eur(view.amImporte)} — techos, no gasto real).
+                  {view.revN > 0 && <> · {num(view.revN)} importes físicamente imposibles ({eur(view.revImporte)}: Santiago —€200 000 reales grabados como €200 000 M— y un techo erróneo) se apartan como error: no se suman, pero siguen visibles y marcados en «Patrones → Contratos más grandes».</>}
                 </p>
               )}
               {view.sinAdjN > 0 && (

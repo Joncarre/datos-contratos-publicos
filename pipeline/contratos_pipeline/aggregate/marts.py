@@ -134,7 +134,7 @@ _MARTS: dict[str, str] = {
                round(sum(importe), 2)            AS importe,
                count(*) FILTER (WHERE status_rank >= 5)         AS adjudicados,
                count(*) FILTER (WHERE es_acuerdo_marco)         AS n_acuerdo_marco,
-               round(sum(importe) FILTER (WHERE es_acuerdo_marco), 2) AS importe_acuerdo_marco,
+               round(sum(importe) FILTER (WHERE es_acuerdo_marco AND NOT revisar_importe), 2) AS importe_acuerdo_marco,
                count(*) FILTER (WHERE es_anulada)               AS n_anuladas,
                count(*) FILTER (WHERE revisar_importe)          AS n_revisar,
                round(sum(importe) FILTER (WHERE revisar_importe), 2)  AS importe_revisar,
@@ -158,7 +158,7 @@ _MARTS: dict[str, str] = {
                round(sum(c.importe), 2)          AS importe,
                count(*) FILTER (WHERE c.status_rank >= 5)         AS adjudicados,
                count(*) FILTER (WHERE c.es_acuerdo_marco)         AS n_acuerdo_marco,
-               round(sum(c.importe) FILTER (WHERE c.es_acuerdo_marco), 2) AS importe_acuerdo_marco,
+               round(sum(c.importe) FILTER (WHERE c.es_acuerdo_marco AND NOT c.revisar_importe), 2) AS importe_acuerdo_marco,
                count(*) FILTER (WHERE c.es_anulada)               AS n_anuladas,
                count(*) FILTER (WHERE c.revisar_importe)          AS n_revisar,
                round(sum(c.importe) FILTER (WHERE c.revisar_importe), 2)  AS importe_revisar,
@@ -167,26 +167,34 @@ _MARTS: dict[str, str] = {
         FROM contratos c JOIN periodos p ON c.year >= p.desde AND c.year <= 2026
         GROUP BY p.periodo, c.source ORDER BY p.periodo, importe DESC NULLS LAST
     """,
+    # importe EXCLUYE las magnitudes físicamente imposibles marcadas (revisar_importe): así el mapa y
+    # la serie no se inflan con Santiago (€200B) ni el techo GMV (€1,3T). El conteo SÍ los incluye
+    # (el contrato existe; solo su importe es inservible). Esos 2 errores siguen visibles y marcados
+    # en "Contratos más grandes". Los acuerdos marco REALES permanecen (objetividad).
     "serie_anual": """
-        SELECT year, source, count(*) AS contratos, round(sum(importe), 2) AS importe
+        SELECT year, source, count(*) AS contratos,
+               round(sum(importe) FILTER (WHERE NOT revisar_importe), 2) AS importe
         FROM contratos WHERE year BETWEEN 2012 AND 2026
         GROUP BY year, source ORDER BY year, source
     """,
     "territorio": """
-        SELECT ccaa, year, source, count(*) AS contratos, round(sum(importe), 2) AS importe
+        SELECT ccaa, year, source, count(*) AS contratos,
+               round(sum(importe) FILTER (WHERE NOT revisar_importe), 2) AS importe
         FROM contratos WHERE ccaa IS NOT NULL AND year BETWEEN 2012 AND 2026
         GROUP BY ccaa, year, source ORDER BY ccaa, year
     """,
     "top_adjudicatarios": """
         SELECT any_value(adjudicatario_nombre) AS nombre, adj_id AS id, source,
-               count(*) AS contratos, round(sum(importe), 2) AS importe,
+               count(*) AS contratos,
+               round(sum(importe) FILTER (WHERE NOT revisar_importe), 2) AS importe,
                count(*) FILTER (WHERE es_acuerdo_marco) AS n_acuerdo_marco
         FROM contratos WHERE adj_id IS NOT NULL AND status_rank >= 5
         GROUP BY adj_id, source ORDER BY importe DESC NULLS LAST LIMIT 200
     """,
     "top_organos": """
         SELECT any_value(organo_nombre) AS nombre, org_id AS id, source,
-               count(*) AS contratos, round(sum(importe), 2) AS importe
+               count(*) AS contratos,
+               round(sum(importe) FILTER (WHERE NOT revisar_importe), 2) AS importe
         FROM contratos WHERE org_id IS NOT NULL
         GROUP BY org_id, source ORDER BY importe DESC NULLS LAST LIMIT 200
     """,
