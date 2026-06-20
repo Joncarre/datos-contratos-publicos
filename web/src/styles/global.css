@@ -200,6 +200,10 @@ button.kbd:hover {
   color: var(--ink);
   box-shadow: var(--shadow-sm);
 }
+/* El periodo solo aplica a Resumen/Territorio: se atenúa donde no refina nada. */
+.period.muted {
+  opacity: 0.5;
+}
 
 /* ── Rail (filtros) ──────────────────────────────────────────────────────── */
 .rail {

@@ -20,6 +20,7 @@ export interface ResumenRow {
   n_revisar: number;
   importe_revisar: number | null;
 }
+export interface ResumenPeriodoRow extends ResumenRow { periodo: string; }
 export interface SerieRow { year: number; source: Source; contratos: number; importe: number | null; }
 export interface TerritorioRow { ccaa: string; year: number; source: Source; contratos: number; importe: number | null; }
 export interface TerritorioPercapitaRow { ccaa: string; year: number; importe: number | null; contratos: number; poblacion: number | null; per_capita: number | null; }
@@ -90,6 +91,7 @@ export interface ProveedorRow {
 
 export interface Marts {
   resumen: ResumenRow[];
+  resumenPeriodos: ResumenPeriodoRow[];
   serie: SerieRow[];
   territorio: TerritorioRow[];
   adjudicatarios: RankRow[];
@@ -121,14 +123,16 @@ export async function loadMarts(): Promise<Marts> {
       getJSON<ContratoRow[]>("top_contratos"),
       getJSON<AnomaliaRow[]>("anomalias"),
     ]);
-  const [concentracion, fraccionamiento, proveedores, territorioPercapita] = await Promise.all([
-    getJSON<ConcentracionRow[]>("concentracion"),
-    getJSON<FraccionamientoRow[]>("fraccionamiento"),
-    getJSON<ProveedorRow[]>("proveedores"),
-    getJSON<TerritorioPercapitaRow[]>("territorio_percapita"),
-  ]);
+  const [concentracion, fraccionamiento, proveedores, territorioPercapita, resumenPeriodos] =
+    await Promise.all([
+      getJSON<ConcentracionRow[]>("concentracion"),
+      getJSON<FraccionamientoRow[]>("fraccionamiento"),
+      getJSON<ProveedorRow[]>("proveedores"),
+      getJSON<TerritorioPercapitaRow[]>("territorio_percapita"),
+      getJSON<ResumenPeriodoRow[]>("resumen_periodos"),
+    ]);
   return {
-    resumen, serie, territorio, adjudicatarios, organos, contratos, anomalias,
+    resumen, resumenPeriodos, serie, territorio, adjudicatarios, organos, contratos, anomalias,
     concentracion, fraccionamiento, proveedores, territorioPercapita,
   };
 }

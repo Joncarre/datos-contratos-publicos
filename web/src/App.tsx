@@ -45,8 +45,11 @@ export default function App() {
     if (!marts) return null;
     const inSource = <T extends { source: Source }>(rows: T[]) =>
       source === "todas" ? rows : rows.filter((r) => r.source === source);
+    const desde = parseInt(period, 10);
+    const inPeriod = <T extends { year: number }>(rows: T[]) => rows.filter((r) => r.year >= desde);
 
-    const resumen = inSource(marts.resumen);
+    // Resumen EXACTO por periodo: incluye recuentos ÚNICOS (adj_id/org_id), no derivables de la serie.
+    const resumen = inSource(marts.resumenPeriodos.filter((r) => parseInt(r.periodo, 10) === desde));
     const totalImporte = resumen.reduce((a, r) => a + (r.importe ?? 0), 0);
     const totalContratos = resumen.reduce((a, r) => a + r.contratos, 0);
     const totalAdj = resumen.reduce((a, r) => a + r.adjudicatarios, 0);
@@ -55,20 +58,20 @@ export default function App() {
     const revN = resumen.reduce((a, r) => a + (r.n_revisar ?? 0), 0);
     const revImporte = resumen.reduce((a, r) => a + (r.importe_revisar ?? 0), 0);
 
-    const ccaaMap = sumBy(inSource(marts.territorio), (r) => r.ccaa, (r) => r.importe);
+    const ccaaMap = sumBy(inPeriod(inSource(marts.territorio)), (r) => r.ccaa, (r) => r.importe);
     const ccaa = [...ccaaMap.entries()]
       .map(([nombre, importe]) => ({ nombre, importe }))
       .sort((a, b) => b.importe - a.importe);
     const maxCcaa = ccaa[0]?.importe ?? 1;
 
     // Per cápita (€/persona acumulado) — todas las fuentes, independiente del filtro de fuente.
-    const ccaaPCMap = sumBy(marts.territorioPercapita, (r) => r.ccaa, (r) => r.per_capita);
+    const ccaaPCMap = sumBy(inPeriod(marts.territorioPercapita), (r) => r.ccaa, (r) => r.per_capita);
     const ccaaPC = [...ccaaPCMap.entries()]
       .map(([nombre, importe]) => ({ nombre, importe }))
       .sort((a, b) => b.importe - a.importe);
     const maxCcaaPC = ccaaPC[0]?.importe ?? 1;
 
-    const serieMap = sumBy(inSource(marts.serie), (r) => String(r.year), (r) => r.importe);
+    const serieMap = sumBy(inPeriod(inSource(marts.serie)), (r) => String(r.year), (r) => r.importe);
     const serie = [...serieMap.entries()]
       .map(([y, importe]) => ({ year: +y, importe }))
       .sort((a, b) => a.year - b.year);
@@ -96,10 +99,14 @@ export default function App() {
       proveedores: marts.proveedores.slice(0, 12),
       fraccionamiento: marts.fraccionamiento.slice(0, 12),
     };
-  }, [marts, source]);
+  }, [marts, source, period]);
 
   const active = SECTIONS.find((s) => s.id === section)!;
   const sourceLabel = source === "todas" ? "todas las fuentes" : SOURCE_LABEL[source as Source];
+  // El periodo solo refina vistas resueltas por año (Resumen y Territorio). Los rankings y patrones
+  // son sobre el histórico completo; etiquetarlo así evita dar a entender que están filtrados.
+  const periodScoped = section === "resumen" || section === "territorio";
+  const scopeLabel = periodScoped ? period : "histórico completo";
 
   return (
     <div className="app">
@@ -127,7 +134,14 @@ export default function App() {
           />
           <button type="submit" className="kbd" aria-label="Buscar">↵</button>
         </form>
-        <div className="period" role="group" aria-label="Periodo">
+        <div
+          className={`period${periodScoped ? "" : " muted"}`}
+          role="group"
+          aria-label="Periodo"
+          title={periodScoped
+            ? "Periodo — aplica a Resumen y Territorio"
+            : "El periodo solo afecta a Resumen y Territorio"}
+        >
           {PERIODS.map((p) => (
             <button key={p} aria-pressed={period === p} onClick={() => setPeriod(p)}>{p}</button>
           ))}
@@ -171,7 +185,7 @@ export default function App() {
       <main className="canvas">
         <div className="section-head">
           <h1>{active.label}</h1>
-          <span className="meta">{active.sub} · {period} · {sourceLabel}</span>
+          <span className="meta">{active.sub} · {scopeLabel} · {sourceLabel}</span>
         </div>
 
         {section === "investigar" && (

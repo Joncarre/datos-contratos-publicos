@@ -140,6 +140,29 @@ _MARTS: dict[str, str] = {
                round(sum(importe) FILTER (WHERE revisar_importe), 2)  AS importe_revisar
         FROM contratos GROUP BY source ORDER BY importe DESC NULLS LAST
     """,
+    # Igual que `resumen` pero EXACTO para cada uno de los 3 periodos fijos (rangos anidados que
+    # terminan en 2026). Permite que el filtro de periodo de la web cambie de forma honesta incluso
+    # los recuentos ÚNICOS (adjudicatarios/órganos por adj_id/org_id), que NO son aditivos por año y
+    # por tanto no podrían derivarse de la serie anual. Restringe a [desde, 2026], igual que serie y
+    # territorio (coherencia). Los guiones largos coinciden con las etiquetas del frontend.
+    "resumen_periodos": """
+        WITH periodos(periodo, desde) AS (
+            VALUES ('2012–2026', 2012), ('2018–2026', 2018), ('2022–2026', 2022)
+        )
+        SELECT p.periodo, c.source,
+               count(*)                          AS contratos,
+               count(DISTINCT c.adj_id)          AS adjudicatarios,
+               count(DISTINCT c.org_id)          AS organos,
+               round(sum(c.importe), 2)          AS importe,
+               count(*) FILTER (WHERE c.status_rank >= 5)         AS adjudicados,
+               count(*) FILTER (WHERE c.es_acuerdo_marco)         AS n_acuerdo_marco,
+               round(sum(c.importe) FILTER (WHERE c.es_acuerdo_marco), 2) AS importe_acuerdo_marco,
+               count(*) FILTER (WHERE c.es_anulada)               AS n_anuladas,
+               count(*) FILTER (WHERE c.revisar_importe)          AS n_revisar,
+               round(sum(c.importe) FILTER (WHERE c.revisar_importe), 2)  AS importe_revisar
+        FROM contratos c JOIN periodos p ON c.year >= p.desde AND c.year <= 2026
+        GROUP BY p.periodo, c.source ORDER BY p.periodo, importe DESC NULLS LAST
+    """,
     "serie_anual": """
         SELECT year, source, count(*) AS contratos, round(sum(importe), 2) AS importe
         FROM contratos WHERE year BETWEEN 2012 AND 2026
