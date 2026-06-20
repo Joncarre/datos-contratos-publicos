@@ -166,6 +166,16 @@ button {
   border-radius: 4px;
   padding: 1px 6px;
 }
+button.kbd {
+  background: var(--surface);
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1.3;
+}
+button.kbd:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+}
 
 .period {
   margin-left: auto;

@@ -57,7 +57,9 @@ function buildWhere(f: Filters): string {
   return c.length ? "WHERE " + c.join(" AND ") : "";
 }
 
-export default function Investigar() {
+type Seed = { text: string; nonce: number };
+
+export default function Investigar({ seed }: { seed?: Seed | null }) {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>(emptyFilters);
@@ -65,19 +67,43 @@ export default function Investigar() {
   const [stats, setStats] = useState<{ n: number; imp: number; adj: number; org: number } | null>(null);
   const [sel, setSel] = useState<Contrato | null>(null);
   const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<Filters | null>(null);
 
   useEffect(() => {
     warmup().then(() => setReady(true)).catch((e) => setError(String(e.message ?? e)));
   }, []);
 
+  // Semilla desde el buscador de cabecera: si parece un NIF lo mete en el campo NIF,
+  // si no, en Adjudicatario. Deja la búsqueda pendiente para lanzarla al estar listo el motor.
+  useEffect(() => {
+    if (!seed?.text) return;
+    const t = seed.text.trim();
+    const compact = t.replace(/[\s.-]/g, "");
+    const isNif = /^[A-Za-z]?\d{7,8}[A-Za-z]?$/.test(compact);
+    const nf: Filters = { ...emptyFilters, [isNif ? "nif" : "adjudicatario"]: isNif ? compact.toUpperCase() : t };
+    setFilters(nf);
+    setPending(nf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seed?.nonce]);
+
+  // Lanza la búsqueda pendiente en cuanto el motor esté listo.
+  useEffect(() => {
+    if (ready && pending) {
+      const f = pending;
+      setPending(null);
+      void run(f);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, pending]);
+
   const set = (k: keyof Filters, v: string | boolean) => setFilters((f) => ({ ...f, [k]: v }));
 
-  async function buscar() {
+  async function run(f: Filters) {
     setBusy(true);
     setError(null);
     setSel(null);
     try {
-      const where = buildWhere(filters);
+      const where = buildWhere(f);
       const data = await query<Contrato>(
         `SELECT ${COLS} FROM ${SRC} ${where} ORDER BY importe DESC NULLS LAST LIMIT 200`,
       );
@@ -93,6 +119,8 @@ export default function Investigar() {
       setBusy(false);
     }
   }
+
+  const buscar = () => run(filters);
 
   return (
     <>

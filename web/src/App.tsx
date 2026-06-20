@@ -34,6 +34,8 @@ export default function App() {
   const [period, setPeriod] = useState(PERIODS[0]);
   const [section, setSection] = useState<SectionId>("resumen");
   const [territorioMode, setTerritorioMode] = useState<"total" | "percapita">("total");
+  const [q, setQ] = useState("");
+  const [seed, setSeed] = useState<{ text: string; nonce: number } | null>(null);
 
   useEffect(() => {
     loadMarts().then(setMarts).catch((e) => setError(String(e.message ?? e)));
@@ -106,11 +108,25 @@ export default function App() {
           <span>CONTRATACIÓN<span className="dot">·</span>ES</span>
           <span className="sub">registro de contratación pública · 2012+</span>
         </div>
-        <label className="search">
+        <form
+          className="search"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const t = q.trim();
+            if (!t) return;
+            setSection("investigar");
+            setSeed({ text: t, nonce: Date.now() });
+          }}
+        >
           <span aria-hidden>⌕</span>
-          <input placeholder="Buscar órgano, proveedor, objeto, CPV…" aria-label="Buscar" />
-          <span className="kbd">/</span>
-        </label>
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Buscar proveedor o NIF → Investigar"
+            aria-label="Buscar"
+          />
+          <button type="submit" className="kbd" aria-label="Buscar">↵</button>
+        </form>
         <div className="period" role="group" aria-label="Periodo">
           {PERIODS.map((p) => (
             <button key={p} aria-pressed={period === p} onClick={() => setPeriod(p)}>{p}</button>
@@ -165,7 +181,7 @@ export default function App() {
               <p className="meta">Inicializando DuckDB-WASM en el navegador (la primera vez tarda unos segundos).</p>
             </section>
           }>
-            <Investigar />
+            <Investigar seed={seed} />
           </Suspense>
         )}
 
