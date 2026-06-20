@@ -126,6 +126,106 @@ def compact() -> None:
     console.print(f"Bronze compactado en {out} · {total:,} filas. Los marts ya lo usarán.")
 
 
+@app.command()
+def silver() -> None:
+    """Materializa la capa Silver: expedientes canónicos consultables, con procedencia."""
+    from contratos_pipeline.aggregate.marts import build_silver
+
+    console.print("Materializando Silver (dedup canónico) ...")
+    n = build_silver()
+    dest = config.processed_root() / "_silver" / "contratos.parquet"
+    console.print(f"[bold green]Silver[/]: {n:,} expedientes -> {dest}")
+
+
+@app.command("index-files")
+def index_files() -> None:
+    """Indexa los ficheros ATOM en disco (carpeta/año + nombre) para resolver rutas exactas."""
+    from contratos_pipeline.query import build_file_manifest
+
+    n = build_file_manifest()
+    console.print(f"[bold green]Manifiesto[/]: {n:,} ficheros .atom indexados")
+
+
+def _print_contratos(rows: list) -> None:
+    if not rows:
+        console.print("[yellow]Sin resultados.[/]")
+        return
+    table = Table("importe", "id_origen", "adjudicatario", "órgano", "fuente/año", "fichero")
+    for r in rows:
+        imp = r.get("importe")
+        table.add_row(
+            f"{imp:,.0f}" if imp is not None else "-",
+            (r.get("id_origen") or "-")[:22],
+            (r.get("adjudicatario_nombre") or "-")[:26],
+            (r.get("organo_nombre") or "-")[:26],
+            f"{(r.get('source') or '')[:6]}/{r.get('year') or ''}",
+            (r.get("fichero") or "?")[:48],
+        )
+    console.print(table)
+    console.print(f"[dim]{len(rows)} resultado(s).[/]")
+
+
+@app.command()
+def find(
+    id: str = typer.Option(None, help="id de expediente (ContractFolderID) exacto"),
+    adjudicatario: str = typer.Option(None, help="adjudicatario (subcadena)"),
+    organo: str = typer.Option(None, help="órgano (subcadena)"),
+    nif: str = typer.Option(None, help="NIF de adjudicatario u órgano"),
+    objeto: str = typer.Option(None, help="objeto del contrato (subcadena)"),
+    cpv: str = typer.Option(None, help="prefijo de CPV"),
+    ccaa: str = typer.Option(None, help="CCAA (subcadena)"),
+    source: str = typer.Option(None, help="fuente: " + ", ".join(config.SOURCES)),
+    estado: str = typer.Option(None, help="estado (RES, ADJ, PUB, EV, ...)"),
+    year: int = typer.Option(None, help="año"),
+    min_importe: float = typer.Option(None, "--min-importe", help="importe mínimo"),
+    max_importe: float = typer.Option(None, "--max-importe", help="importe máximo"),
+    revisar: bool = typer.Option(False, help="solo contratos 'a verificar'"),
+    acuerdo_marco: bool = typer.Option(False, "--acuerdo-marco", help="solo acuerdos marco"),
+    limit: int = typer.Option(40, help="máximo de resultados"),
+) -> None:
+    """Busca contratos por filtros sobre la capa Silver, con su fichero de origen."""
+    from contratos_pipeline.query import find_contracts
+
+    filters = {
+        "id": id, "adjudicatario": adjudicatario, "organo": organo, "nif": nif,
+        "objeto": objeto, "cpv": cpv, "ccaa": ccaa, "source": source, "estado": estado,
+        "year": year, "min_importe": min_importe, "max_importe": max_importe,
+        "solo_revisar": revisar, "solo_acuerdo_marco": acuerdo_marco,
+    }
+    _print_contratos(find_contracts(filters, limit=limit))
+
+
+@app.command()
+def inspect(
+    id: str = typer.Argument(..., help="id de expediente (ContractFolderID)"),
+    source: str = typer.Option(None, help="acotar a una fuente"),
+) -> None:
+    """Ficha completa de un contrato + su fichero ATOM de origen (carpeta y nombre)."""
+    from contratos_pipeline.query import inspect_contract
+
+    rows = inspect_contract(id, source)
+    if not rows:
+        console.print(f"[yellow]No se encontró el expediente {id!r}.[/]")
+        raise typer.Exit(code=1)
+    fields = [
+        "estado", "organo_nombre", "organo_nif", "organo_nivel", "ccaa", "territorio_nombre",
+        "objeto", "cpv", "tipo_contrato", "importe", "importe_adjudicado",
+        "importe_total_con_iva", "importe_sin_iva", "fecha_adjudicacion", "year",
+        "adjudicatario_nombre", "adjudicatario_nif", "es_acuerdo_marco", "revisar_importe",
+    ]
+    for r in rows:
+        console.rule(f"{r.get('id_origen')} · {r.get('source')}")
+        for k in fields:
+            v = r.get(k)
+            if v is not None and v != "":
+                console.print(f"  [bold]{k}[/]  {v}")
+        console.print(f"  [bold]link PLACSP[/]  {r.get('link_detalle')}")
+        console.print(f"  [bold cyan]FICHERO[/]  {r.get('fichero')}")
+        cands = r.get("ficheros_candidatos") or []
+        if len(cands) > 1:
+            console.print(f"  [dim]otros candidatos: {', '.join(cands)}[/]")
+
+
 def main() -> None:
     app()
 

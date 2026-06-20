@@ -154,8 +154,9 @@ _MARTS: dict[str, str] = {
     """,
     # Vista de transparencia: los contratos individuales más grandes, con detalle y banderas.
     # Aquí aparecen los acuerdos marco enormes y el contrato "a verificar" — nada se oculta.
+    # Incluye procedencia (source + source_file + id_origen) para localizar/verificar el contrato.
     "top_contratos": """
-        SELECT id_origen, source, estado, year, ccaa,
+        SELECT id_origen, source, source_file, estado, year, ccaa,
                substr(objeto, 1, 140) AS objeto,
                organo_nombre, adjudicatario_nombre, round(importe, 2) AS importe,
                es_acuerdo_marco, revisar_importe, link_detalle
@@ -168,8 +169,8 @@ _MARTS: dict[str, str] = {
     # Solo descriptivo: se ordena por rareza y se MUESTRA; no hay umbral absoluto ni se descarta nada.
     "anomalias": """
         WITH c AS (
-            SELECT id_origen, source, year, ccaa, objeto, organo_nombre, adjudicatario_nombre,
-                   importe, cpv, tipo_contrato, es_acuerdo_marco, link_detalle,
+            SELECT id_origen, source, source_file, year, ccaa, objeto, organo_nombre,
+                   adjudicatario_nombre, importe, cpv, tipo_contrato, es_acuerdo_marco, link_detalle,
                    coalesce(substr(cpv, 1, 2), 'NA') || '|' || coalesce(tipo_contrato, 'NA') AS peer,
                    ln(importe) AS limp
             FROM contratos WHERE importe > 0
@@ -177,7 +178,8 @@ _MARTS: dict[str, str] = {
         -- median() + mad() en UNA pasada (mad = mediana de |x - mediana|); robusto a outliers.
         stats AS (SELECT peer, median(limp) AS med, mad(limp) AS madv, count(*) AS n
                   FROM c GROUP BY peer)
-        SELECT c.id_origen, c.source, c.year, c.ccaa, substr(c.objeto, 1, 120) AS objeto,
+        SELECT c.id_origen, c.source, c.source_file, c.year, c.ccaa,
+               substr(c.objeto, 1, 120) AS objeto,
                c.organo_nombre, c.adjudicatario_nombre, round(c.importe, 2) AS importe,
                c.cpv, c.peer, s.n AS peers, c.es_acuerdo_marco,
                round(exp(s.med), 2) AS importe_mediano_peer,
@@ -293,3 +295,33 @@ def build_marts() -> dict[str, int]:
 
     counts.update(politica.build_politica(con, _write_json))
     return counts
+
+
+def build_silver() -> int:
+    """Materializa los expedientes canónicos (dedup) en `_silver/contratos.parquet`, con procedencia.
+
+    Es la capa CONSULTABLE para investigación (`find` / `inspect`) y para verificar cada dato
+    contra su fichero ATOM de origen. Una fila por expediente canónico (~1,95 M).
+    """
+    import duckdb
+
+    con = duckdb.connect()
+    con.execute("SET enable_progress_bar = false")
+    for sql in _setup_views_sql():
+        con.execute(sql)
+
+    silver = config.processed_root() / "_silver"
+    silver.mkdir(parents=True, exist_ok=True)
+    target = (silver / "contratos.parquet").as_posix()
+    cols = """
+        source, source_file, source_file_hash, id_origen, entry_id, link_detalle, estado,
+        organo_nombre, organo_id, organo_nif, organo_nivel, admin_hierarchy,
+        objeto, tipo_contrato, cpv, territorio_code, territorio_nombre, ccaa,
+        adjudicatario_nombre, adjudicatario_nif, fecha_adjudicacion, updated, year,
+        round(importe, 2) AS importe, importe_adjudicado, importe_total_con_iva,
+        importe_sin_iva, sum_importe, es_acuerdo_marco, es_anulada, revisar_importe, n_resultados
+    """
+    con.execute(
+        f"COPY (SELECT {cols} FROM contratos) TO '{target}' (FORMAT PARQUET, COMPRESSION zstd)"
+    )
+    return con.execute(f"SELECT count(*) FROM read_parquet('{target}')").fetchone()[0]

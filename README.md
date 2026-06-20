@@ -40,7 +40,9 @@ py -m venv .venv
 # Flujo completo de datos (idempotente: reprocesa solo lo nuevo)
 .venv/Scripts/python -m contratos_pipeline ingest contratos_menores   # idem: perfil_contratante, agregaciones, encargos
 .venv/Scripts/python -m contratos_pipeline compact                    # consolida miles de Parquet -> 1 por fuente (rebuild rápido)
-.venv/Scripts/python -m contratos_pipeline marts                      # dedup + análisis -> web/public/data/*.json
+.venv/Scripts/python -m contratos_pipeline silver                     # capa canónica CONSULTABLE (5,08M expedientes)
+.venv/Scripts/python -m contratos_pipeline index-files                # índice de ficheros .atom (carpeta/año -> ruta)
+.venv/Scripts/python -m contratos_pipeline marts                      # análisis -> web/public/data/*.json
 
 # Utilidades
 .venv/Scripts/python -m contratos_pipeline info                       # rutas y fuentes
@@ -80,6 +82,22 @@ data/placsp/agregaciones/          (2016+, licitaciones agregadas)
 data/placsp/encargos/              (2022+, encargos a medios propios)
 data/referencia/                   (dimensiones pequeñas y versionables)
 ```
+
+## Investigación a nivel de contrato (CLI)
+
+Sobre la capa **Silver** (5,08 M expedientes canónicos), con **trazabilidad al fichero ATOM de origen** para verificar cualquier dato en disco:
+
+```bash
+# Buscar por filtros (combínalos): adjudicatario, órgano, NIF, objeto, CPV, CCAA, año, fuente, importe…
+python -m contratos_pipeline find --adjudicatario "SANTIAGO PUENTE"
+python -m contratos_pipeline find --min-importe 1000000000 --ccaa Madrid --year 2023
+python -m contratos_pipeline find --revisar           # solo los marcados "a verificar"
+
+# Ficha completa de un expediente + su FICHERO y CARPETA de origen
+python -m contratos_pipeline inspect "1802/2024" --source perfil_contratante
+```
+
+`find`/`inspect` muestran el `id_origen`, el adjudicatario/órgano, el importe, las banderas y la **ruta exacta** del `.atom` (p. ej. `placsp/perfil_contratante/2026/licitaciones…_9.atom`), para abrirlo y comprobar el dato. Nota: un mismo `id_origen` puede repetirse entre órganos distintos; ambos se muestran.
 
 ## Aviso
 
