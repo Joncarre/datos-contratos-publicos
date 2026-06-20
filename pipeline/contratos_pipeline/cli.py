@@ -196,6 +196,48 @@ def find(
 
 
 @app.command()
+def stats(
+    adjudicatario: str = typer.Option(None, help="adjudicatario (subcadena)"),
+    organo: str = typer.Option(None, help="órgano (subcadena)"),
+    nif: str = typer.Option(None, help="NIF de adjudicatario u órgano"),
+    objeto: str = typer.Option(None, help="objeto del contrato (subcadena)"),
+    cpv: str = typer.Option(None, help="prefijo de CPV"),
+    ccaa: str = typer.Option(None, help="CCAA (subcadena)"),
+    source: str = typer.Option(None, help="fuente: " + ", ".join(config.SOURCES)),
+    estado: str = typer.Option(None, help="estado (RES, ADJ, PUB, EV, ...)"),
+    year: int = typer.Option(None, help="año"),
+    min_importe: float = typer.Option(None, "--min-importe", help="importe mínimo"),
+    max_importe: float = typer.Option(None, "--max-importe", help="importe máximo"),
+    revisar: bool = typer.Option(False, help="solo 'a verificar'"),
+    acuerdo_marco: bool = typer.Option(False, "--acuerdo-marco", help="solo acuerdos marco"),
+) -> None:
+    """Conclusiones agregadas sobre el subconjunto filtrado (total, top adjudicatarios, por año)."""
+    from contratos_pipeline.query import aggregate_stats
+
+    filters = {
+        "adjudicatario": adjudicatario, "organo": organo, "nif": nif, "objeto": objeto,
+        "cpv": cpv, "ccaa": ccaa, "source": source, "estado": estado, "year": year,
+        "min_importe": min_importe, "max_importe": max_importe,
+        "solo_revisar": revisar, "solo_acuerdo_marco": acuerdo_marco,
+    }
+    s = aggregate_stats(filters)
+    t = s["total"]
+    console.print(
+        f"[bold]Contratos[/] {t[0]:,} · [bold]Importe[/] {(t[1] or 0):,.0f} EUR · "
+        f"adjudicatarios {t[2]:,} · órganos {t[3]:,} · a verificar {t[4]:,} · "
+        f"acuerdos marco {t[5]:,}"
+    )
+    tadj = Table("importe", "contratos", "adjudicatario", title="Top adjudicatarios")
+    for nombre, imp, n in s["top_adjudicatarios"]:
+        tadj.add_row(f"{(imp or 0):,.0f}", f"{n:,}", (nombre or "-")[:42])
+    console.print(tadj)
+    tyear = Table("año", "contratos", "importe", title="Por año")
+    for y, n, imp in s["por_anio"]:
+        tyear.add_row(str(y), f"{n:,}", f"{(imp or 0):,.0f}")
+    console.print(tyear)
+
+
+@app.command()
 def inspect(
     id: str = typer.Argument(..., help="id de expediente (ContractFolderID)"),
     source: str = typer.Option(None, help="acotar a una fuente"),

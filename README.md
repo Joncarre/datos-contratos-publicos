@@ -95,6 +95,10 @@ python -m contratos_pipeline find --revisar           # solo los marcados "a ver
 
 # Ficha completa de un expediente + su FICHERO y CARPETA de origen
 python -m contratos_pipeline inspect "1802/2024" --source perfil_contratante
+
+# Conclusiones AGREGADAS sobre cualquier filtro (total, top adjudicatarios, por año)
+python -m contratos_pipeline stats --adjudicatario "DRAGADOS"
+python -m contratos_pipeline stats --ccaa Madrid --year 2023
 ```
 
 `find`/`inspect` muestran el `id_origen`, el adjudicatario/órgano, el importe, las banderas y la **ruta exacta** del `.atom` (p. ej. `placsp/perfil_contratante/2026/licitaciones…_9.atom`), para abrirlo y comprobar el dato. Nota: un mismo `id_origen` puede repetirse entre órganos distintos; ambos se muestran.

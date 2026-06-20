@@ -98,11 +98,7 @@ def _query(sql: str, params: list[Any]) -> list[dict[str, Any]]:
     return rows
 
 
-def find_contracts(filters: dict[str, Any], limit: int = 50) -> list[dict[str, Any]]:
-    silver = silver_path()
-    if not silver.exists():
-        raise FileNotFoundError("No existe la capa Silver. Ejecuta primero: `silver`.")
-
+def _build_where(filters: dict[str, Any]) -> tuple[str, list[Any]]:
     conds: list[str] = []
     params: list[Any] = []
     for key, expr, cast in _FILTERS:
@@ -118,13 +114,54 @@ def find_contracts(filters: dict[str, Any], limit: int = 50) -> list[dict[str, A
         conds.append("revisar_importe")
     if filters.get("solo_acuerdo_marco"):
         conds.append("es_acuerdo_marco")
-
     where = (" WHERE " + " AND ".join(conds)) if conds else ""
+    return where, params
+
+
+def find_contracts(filters: dict[str, Any], limit: int = 50) -> list[dict[str, Any]]:
+    silver = silver_path()
+    if not silver.exists():
+        raise FileNotFoundError("No existe la capa Silver. Ejecuta primero: `silver`.")
+    where, params = _build_where(filters)
     sql = (
         f"SELECT * FROM read_parquet('{silver.as_posix()}'){where} "
         f"ORDER BY importe DESC NULLS LAST LIMIT {int(limit)}"
     )
     return _query(sql, params)
+
+
+def aggregate_stats(filters: dict[str, Any]) -> dict[str, Any]:
+    """Conclusiones agregadas sobre el subconjunto filtrado (sobre la capa Silver canónica)."""
+    import duckdb
+
+    silver = silver_path()
+    if not silver.exists():
+        raise FileNotFoundError("No existe la capa Silver. Ejecuta primero: `silver`.")
+    where, params = _build_where(filters)
+    con = duckdb.connect()
+    con.execute(
+        f"CREATE TEMP TABLE f AS SELECT * FROM read_parquet('{silver.as_posix()}'){where}", params
+    )
+    total = con.execute("""
+        SELECT count(*) AS contratos,
+               round(sum(importe), 2) AS importe,
+               count(DISTINCT adjudicatario_nif) AS adjudicatarios,
+               count(DISTINCT organo_nif) AS organos,
+               count(*) FILTER (WHERE revisar_importe) AS a_verificar,
+               count(*) FILTER (WHERE es_acuerdo_marco) AS acuerdos_marco
+        FROM f
+    """).fetchone()
+    top_adj = con.execute("""
+        SELECT any_value(adjudicatario_nombre) AS nombre, round(sum(importe), 2) AS importe,
+               count(*) AS contratos
+        FROM f WHERE adjudicatario_nif IS NOT NULL
+        GROUP BY adjudicatario_nif ORDER BY importe DESC NULLS LAST LIMIT 10
+    """).fetchall()
+    por_anio = con.execute("""
+        SELECT year, count(*) AS contratos, round(sum(importe), 2) AS importe
+        FROM f WHERE year BETWEEN 2012 AND 2026 GROUP BY year ORDER BY year
+    """).fetchall()
+    return {"total": total, "top_adjudicatarios": top_adj, "por_anio": por_anio}
 
 
 def inspect_contract(id_origen: str, source: str | None = None) -> list[dict[str, Any]]:
