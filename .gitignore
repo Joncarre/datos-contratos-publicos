@@ -89,6 +89,10 @@ logs/
 tmp/
 .tmp/
 *.tmp
+# Scripts y capturas de diagnóstico (puppeteer, screenshots locales)
+map_check.*
+*_check.cjs
+*_check.png
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Sistema operativo / IDE

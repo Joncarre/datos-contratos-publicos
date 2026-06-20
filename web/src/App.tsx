@@ -1,6 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import {
-  CCAA_ABBR,
   eur,
   loadMarts,
   num,
@@ -10,6 +9,7 @@ import {
   type Marts,
   type Source,
 } from "./lib/marts";
+import { SpainMap } from "./SpainMap";
 
 const Investigar = lazy(() => import("./Investigar"));
 
@@ -225,34 +225,35 @@ export default function App() {
 
         {view && section === "territorio" && (() => {
           const pc = territorioMode === "percapita";
-          const data = pc ? view.ccaaPC : view.ccaa;
-          const max = pc ? view.maxCcaaPC : view.maxCcaa;
+          const arr = [...(pc ? view.ccaaPC : view.ccaa)].sort((a, b) => (b.importe || 0) - (a.importe || 0));
+          const mapData = new Map(arr.map((c) => [c.nombre, c.importe] as const));
+          const fmt = (n: number) => eur(n) + (pc ? " /persona" : "");
           return (
             <section className="card wide">
               <div className="card-head">
-                <h3>Gasto por CCAA</h3>
+                <h3>Gasto por comunidad autónoma</h3>
                 <div className="period" role="group" aria-label="Modo territorio">
                   <button aria-pressed={!pc} onClick={() => setTerritorioMode("total")}>Total</button>
                   <button aria-pressed={pc} onClick={() => setTerritorioMode("percapita")}>Per cápita</button>
                 </div>
               </div>
-              <div className="map">
-                {data.slice(0, 19).map((c) => {
-                  const norm = Math.sqrt((c.importe || 0) / max);
-                  const bucket = Math.min(6, Math.max(1, 1 + Math.floor(norm * 5.99)));
-                  return (
-                    <div className="cell" key={c.nombre} style={{ background: `var(--seq-${bucket})` }}
-                      title={`${c.nombre}: ${eur(c.importe)}${pc ? " /persona" : ""}`}>
-                      {CCAA_ABBR[c.nombre] ?? c.nombre.slice(0, 3).toUpperCase()}
-                    </div>
-                  );
-                })}
+              <div className="territorio-grid">
+                <SpainMap data={mapData} format={fmt} />
+                <ol className="ccaa-rank">
+                  {arr.slice(0, 12).map((c, i) => (
+                    <li key={c.nombre}>
+                      <span className="r-idx">{i + 1}</span>
+                      <span className="r-name" title={c.nombre}>{c.nombre}</span>
+                      <span className="r-val">{fmt(c.importe)}</span>
+                    </li>
+                  ))}
+                </ol>
               </div>
-              {data.length === 0 && <p className="meta">Sin territorio asignado.</p>}
+              {arr.length === 0 && <p className="meta">Sin territorio asignado.</p>}
               <p className="meta" style={{ marginTop: "var(--sp-3)" }}>
                 {pc
-                  ? "€/persona acumulado 2012–2026 (población INE). Excluye errores marcados; incluye acuerdos marco. La contratación estatal aún pesa hacia Madrid (efecto sede)."
-                  : "Importe total. La contratación estatal se registra en la sede del organismo (efecto Madrid)."}
+                  ? "€/persona acumulado 2012–2026 (población INE). Color en escala logarítmica; los valores exactos están en el ranking. Excluye errores marcados; incluye acuerdos marco. La contratación estatal aún pesa hacia Madrid (efecto sede)."
+                  : "Importe total acumulado 2012–2026. Color en escala logarítmica; los valores exactos están en el ranking. La contratación estatal se registra en la sede del organismo (efecto Madrid)."}
               </p>
             </section>
           );

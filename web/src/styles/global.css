@@ -343,20 +343,96 @@ button {
   font-size: var(--fs-12);
 }
 
-/* Mapa placeholder */
-.map {
+/* Mapa coroplético real de España (CCAA) + ranking lateral */
+.territorio-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
-  gap: 6px;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  gap: var(--sp-5);
+  align-items: start;
 }
-.map .cell {
-  aspect-ratio: 1.4;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: flex-end;
-  padding: var(--sp-2);
-  font-size: var(--fs-12);
+.spainmap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+.spainmap .ccaa {
+  stroke: var(--surface);
+  stroke-width: 0.75;
+  transition: fill var(--dur) var(--ease), opacity var(--dur) var(--ease);
+  cursor: pointer;
+}
+.spainmap .ccaa:hover,
+.spainmap .ccaa.hov {
+  opacity: 0.82;
+  stroke: var(--ink);
+  stroke-width: 1.1;
+}
+.spainmap .mapborder {
+  fill: none;
+  stroke: var(--border-strong, rgba(0, 0, 0, 0.28));
+  stroke-width: 0.75;
+}
+.spainmap .mapcap {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-13);
   color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  min-height: 1.4em;
+}
+.spainmap .maplegend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--sp-2);
+  font-size: var(--fs-12);
+  color: var(--ink-3);
+}
+.spainmap .maplegend i {
+  width: 22px;
+  height: 9px;
+  display: inline-block;
+  border-radius: 2px;
+}
+.spainmap .maplegend .leg-note {
+  margin-left: auto;
+  font-style: italic;
+}
+.ccaa-rank {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ccaa-rank li {
+  display: grid;
+  grid-template-columns: 1.6em minmax(0, 1fr) auto;
+  gap: var(--sp-2);
+  align-items: baseline;
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.07));
+  font-size: var(--fs-13);
+}
+.ccaa-rank .r-idx {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.ccaa-rank .r-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ccaa-rank .r-val {
+  text-align: right;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 760px) {
+  .territorio-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-4);
+  }
 }
 
 /* Sparkline placeholder */
