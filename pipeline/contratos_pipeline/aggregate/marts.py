@@ -48,9 +48,20 @@ def _setup_views_sql() -> list[str]:
         CREATE OR REPLACE VIEW base AS
         SELECT
             *,
+            -- org_key incluye el nombre SOLO como último recurso y se usa ÚNICAMENTE para
+            -- deduplicar republicaciones del mismo expediente (matching, NO agregar entidades).
             COALESCE(organo_id, organo_nif, organo_dir3, organo_id_plataforma,
                      organo_id_oc_plat, organo_nombre) AS org_key,
-            COALESCE(adjudicatario_id, adjudicatario_nif, adjudicatario_nombre) AS adj_key,
+            -- IDs ÚNICOS (NUNCA el nombre) para AGRUPAR entidades en rankings/stats/HHI. Si no hay
+            -- ningún identificador -> NULL -> no se agrupa. Además se descartan los NIF BASURA
+            -- (placeholder todo ceros, p. ej. A00000000 / U00000000): los comparten entidades
+            -- distintas, así que tampoco son un ID único (regexp_matches '[1-9]' = tiene algún dígito ≠0).
+            CASE WHEN regexp_matches(COALESCE(organo_id, organo_nif, organo_dir3,
+                     organo_id_plataforma, organo_id_oc_plat), '[1-9]')
+                 THEN COALESCE(organo_id, organo_nif, organo_dir3, organo_id_plataforma,
+                     organo_id_oc_plat) END AS org_id,
+            CASE WHEN regexp_matches(COALESCE(adjudicatario_id, adjudicatario_nif), '[1-9]')
+                 THEN COALESCE(adjudicatario_id, adjudicatario_nif) END AS adj_id,
             {_ccaa_case()} AS ccaa,
             CASE upper(estado)
                 WHEN 'RES' THEN 6 WHEN 'ADJ' THEN 5 WHEN 'PUB' THEN 4
@@ -118,8 +129,8 @@ _MARTS: dict[str, str] = {
     "resumen": """
         SELECT source,
                count(*)                          AS contratos,
-               count(DISTINCT adj_key)           AS adjudicatarios,
-               count(DISTINCT org_key)           AS organos,
+               count(DISTINCT adj_id)            AS adjudicatarios,
+               count(DISTINCT org_id)            AS organos,
                round(sum(importe), 2)            AS importe,
                count(*) FILTER (WHERE status_rank >= 5)         AS adjudicados,
                count(*) FILTER (WHERE es_acuerdo_marco)         AS n_acuerdo_marco,
@@ -140,17 +151,17 @@ _MARTS: dict[str, str] = {
         GROUP BY ccaa, year, source ORDER BY ccaa, year
     """,
     "top_adjudicatarios": """
-        SELECT any_value(adjudicatario_nombre) AS nombre, adj_key AS id, source,
+        SELECT any_value(adjudicatario_nombre) AS nombre, adj_id AS id, source,
                count(*) AS contratos, round(sum(importe), 2) AS importe,
                count(*) FILTER (WHERE es_acuerdo_marco) AS n_acuerdo_marco
-        FROM contratos WHERE adj_key IS NOT NULL AND status_rank >= 5
-        GROUP BY adj_key, source ORDER BY importe DESC NULLS LAST LIMIT 200
+        FROM contratos WHERE adj_id IS NOT NULL AND status_rank >= 5
+        GROUP BY adj_id, source ORDER BY importe DESC NULLS LAST LIMIT 200
     """,
     "top_organos": """
-        SELECT any_value(organo_nombre) AS nombre, org_key AS id, source,
+        SELECT any_value(organo_nombre) AS nombre, org_id AS id, source,
                count(*) AS contratos, round(sum(importe), 2) AS importe
-        FROM contratos WHERE org_key IS NOT NULL
-        GROUP BY org_key, source ORDER BY importe DESC NULLS LAST LIMIT 200
+        FROM contratos WHERE org_id IS NOT NULL
+        GROUP BY org_id, source ORDER BY importe DESC NULLS LAST LIMIT 200
     """,
     # Vista de transparencia: los contratos individuales más grandes, con detalle y banderas.
     # Aquí aparecen los acuerdos marco enormes y el contrato "a verificar" — nada se oculta.
@@ -199,23 +210,23 @@ _MARTS: dict[str, str] = {
     # contratos. `importe` (sin los errores `revisar`) se muestra solo de contexto. Descriptivo.
     "concentracion": """
         WITH adj AS (
-            SELECT organo_id, source, adj_key,
+            SELECT org_id, source, adj_id,
                    any_value(organo_nombre) AS organo_nombre,
                    any_value(adjudicatario_nombre) AS adj_nombre,
                    count(*) AS n,
                    sum(CASE WHEN revisar_importe THEN 0 ELSE importe END) AS imp_adj
             FROM contratos
-            WHERE adj_key IS NOT NULL AND status_rank >= 5
-            GROUP BY organo_id, source, adj_key
+            WHERE adj_id IS NOT NULL AND org_id IS NOT NULL AND status_rank >= 5
+            GROUP BY org_id, source, adj_id
         ),
         org AS (
-            SELECT organo_id, source, any_value(organo_nombre) AS organo_nombre,
+            SELECT org_id, source, any_value(organo_nombre) AS organo_nombre,
                    sum(n) AS n_contratos, count(*) AS n_adjudicatarios,
                    sum(power(n, 2)) AS sum_sq_n, sum(imp_adj) AS imp_total,
                    arg_max(adj_nombre, n) AS top_proveedor, max(n) AS top_n
-            FROM adj GROUP BY organo_id, source
+            FROM adj GROUP BY org_id, source
         )
-        SELECT organo_id, organo_nombre, source, n_contratos, n_adjudicatarios,
+        SELECT org_id AS organo_id, organo_nombre, source, n_contratos, n_adjudicatarios,
                round(imp_total, 2) AS importe,
                round(sum_sq_n / nullif(power(n_contratos, 2), 0), 4) AS hhi,
                top_proveedor, round(100.0 * top_n / nullif(n_contratos, 0), 1) AS pct_dominante
@@ -227,19 +238,19 @@ _MARTS: dict[str, str] = {
     # Pares (organo, proveedor) con >=5 menores en esa banda = patron a investigar (no acusacion).
     "fraccionamiento": """
         WITH m AS (
-            SELECT organo_id, organo_nombre, adj_key, adjudicatario_nombre,
+            SELECT org_id, organo_nombre, adj_id, adjudicatario_nombre,
                    importe_sin_iva AS imp,
                    CASE WHEN tipo_contrato = '3' THEN 40000.0 ELSE 15000.0 END AS umbral
             FROM contratos
             WHERE source = 'contratos_menores' AND importe_sin_iva IS NOT NULL
-                  AND adj_key IS NOT NULL
+                  AND adj_id IS NOT NULL AND org_id IS NOT NULL
         )
-        SELECT organo_id, any_value(organo_nombre) AS organo_nombre,
-               adj_key, any_value(adjudicatario_nombre) AS adjudicatario_nombre,
+        SELECT org_id AS organo_id, any_value(organo_nombre) AS organo_nombre,
+               adj_id AS adj_key, any_value(adjudicatario_nombre) AS adjudicatario_nombre,
                count(*) FILTER (WHERE imp >= 0.9 * umbral AND imp < umbral) AS n_cerca_umbral,
                round(sum(imp) FILTER (WHERE imp >= 0.9 * umbral AND imp < umbral), 2) AS importe_cerca,
                count(*) AS n_menores_total
-        FROM m GROUP BY organo_id, adj_key
+        FROM m GROUP BY org_id, adj_id
         HAVING count(*) FILTER (WHERE imp >= 0.9 * umbral AND imp < umbral) >= 5
         ORDER BY n_cerca_umbral DESC, importe_cerca DESC LIMIT 200
     """,
@@ -248,21 +259,21 @@ _MARTS: dict[str, str] = {
     # (alta dependencia = posible captura). Descriptivo. Importe sin los errores `revisar`.
     "proveedores": """
         WITH a AS (
-            SELECT adj_key, organo_id,
+            SELECT adj_id, org_id,
                    any_value(adjudicatario_nombre) AS nombre,
                    any_value(organo_nombre) AS organo_nombre,
                    count(*) AS n,
                    sum(CASE WHEN revisar_importe THEN 0 ELSE importe END) AS imp
-            FROM contratos WHERE adj_key IS NOT NULL AND status_rank >= 5
-            GROUP BY adj_key, organo_id
+            FROM contratos WHERE adj_id IS NOT NULL AND org_id IS NOT NULL AND status_rank >= 5
+            GROUP BY adj_id, org_id
         ),
         p AS (
-            SELECT adj_key, any_value(nombre) AS nombre,
+            SELECT adj_id, any_value(nombre) AS nombre,
                    sum(n) AS n_contratos, sum(imp) AS importe, count(*) AS n_organos,
                    arg_max(organo_nombre, n) AS top_organo, max(n) AS top_organo_n
-            FROM a GROUP BY adj_key
+            FROM a GROUP BY adj_id
         )
-        SELECT adj_key AS id, nombre, n_contratos, n_organos, round(importe, 2) AS importe,
+        SELECT adj_id AS id, nombre, n_contratos, n_organos, round(importe, 2) AS importe,
                top_organo, round(100.0 * top_organo_n / nullif(n_contratos, 0), 1) AS pct_top_organo
         FROM p WHERE n_contratos >= 10
         ORDER BY importe DESC NULLS LAST LIMIT 200
