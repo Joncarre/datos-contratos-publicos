@@ -79,8 +79,8 @@ def export_web_index() -> int:
     con.execute(f"""
         COPY (
             SELECT s.id_origen, s.source, s.source_file, {fichero} AS fichero, s.estado, s.year,
-                   s.organo_nombre, s.organo_nif, s.organo_nivel, s.ccaa,
-                   s.cpv, s.tipo_contrato, s.adjudicatario_nombre, s.adjudicatario_nif,
+                   s.organo_nombre, s.organo_nif, s.org_id, s.organo_nivel, s.ccaa,
+                   s.cpv, s.tipo_contrato, s.adjudicatario_nombre, s.adjudicatario_nif, s.adj_id,
                    s.fecha_adjudicacion, s.importe, s.importe_adjudicado,
                    s.importe_total_con_iva, s.importe_sin_iva,
                    s.es_acuerdo_marco, s.revisar_importe, s.link_detalle
@@ -190,8 +190,8 @@ def aggregate_stats(filters: dict[str, Any]) -> dict[str, Any]:
     total = con.execute("""
         SELECT count(*) AS contratos,
                round(sum(importe), 2) AS importe,
-               count(DISTINCT adjudicatario_nif) AS adjudicatarios,
-               count(DISTINCT organo_nif) AS organos,
+               count(DISTINCT adj_id) AS adjudicatarios,
+               count(DISTINCT org_id) AS organos,
                count(*) FILTER (WHERE revisar_importe) AS a_verificar,
                count(*) FILTER (WHERE es_acuerdo_marco) AS acuerdos_marco
         FROM f
@@ -199,8 +199,8 @@ def aggregate_stats(filters: dict[str, Any]) -> dict[str, Any]:
     top_adj = con.execute("""
         SELECT any_value(adjudicatario_nombre) AS nombre, round(sum(importe), 2) AS importe,
                count(*) AS contratos
-        FROM f WHERE adjudicatario_nif IS NOT NULL
-        GROUP BY adjudicatario_nif ORDER BY importe DESC NULLS LAST LIMIT 10
+        FROM f WHERE adj_id IS NOT NULL
+        GROUP BY adj_id ORDER BY importe DESC NULLS LAST LIMIT 10
     """).fetchall()
     por_anio = con.execute("""
         SELECT year, count(*) AS contratos, round(sum(importe), 2) AS importe

@@ -326,9 +326,9 @@ def build_silver() -> int:
     target = (silver / "contratos.parquet").as_posix()
     cols = """
         source, source_file, source_file_hash, id_origen, entry_id, link_detalle, estado,
-        organo_nombre, organo_id, organo_nif, organo_nivel, admin_hierarchy,
+        organo_nombre, organo_id, organo_nif, org_id, organo_nivel, admin_hierarchy,
         objeto, tipo_contrato, cpv, territorio_code, territorio_nombre, ccaa,
-        adjudicatario_nombre, adjudicatario_nif, fecha_adjudicacion, updated, year,
+        adjudicatario_nombre, adjudicatario_nif, adj_id, fecha_adjudicacion, updated, year,
         round(importe, 2) AS importe, importe_adjudicado, importe_total_con_iva,
         importe_sin_iva, sum_importe, es_acuerdo_marco, es_anulada, revisar_importe, n_resultados
     """

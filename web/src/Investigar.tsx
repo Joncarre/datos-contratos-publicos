@@ -82,8 +82,8 @@ export default function Investigar() {
         `SELECT ${COLS} FROM ${SRC} ${where} ORDER BY importe DESC NULLS LAST LIMIT 200`,
       );
       const [s] = await query<Record<string, unknown>>(
-        `SELECT count(*) n, sum(importe) imp, count(DISTINCT adjudicatario_nif) adj,
-                count(DISTINCT organo_nif) org FROM ${SRC} ${where}`,
+        `SELECT count(*) n, sum(importe) imp, count(DISTINCT adj_id) adj,
+                count(DISTINCT org_id) org FROM ${SRC} ${where}`,
       );
       setRows(data);
       setStats({ n: N(s.n), imp: N(s.imp), adj: N(s.adj), org: N(s.org) });
