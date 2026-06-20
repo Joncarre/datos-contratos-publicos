@@ -61,6 +61,9 @@ export default function App() {
     const amImporte = resumen.reduce((a, r) => a + (r.importe_acuerdo_marco ?? 0), 0);
     const revN = resumen.reduce((a, r) => a + (r.n_revisar ?? 0), 0);
     const revImporte = resumen.reduce((a, r) => a + (r.importe_revisar ?? 0), 0);
+    const adjudicados = resumen.reduce((a, r) => a + (r.adjudicados ?? 0), 0);
+    const sinAdjN = resumen.reduce((a, r) => a + (r.n_sin_adj ?? 0), 0);
+    const sinAdjImporte = resumen.reduce((a, r) => a + (r.importe_sin_adj ?? 0), 0);
 
     const ccaaMap = sumBy(inPeriod(inSource(marts.territorio)), (r) => r.ccaa, (r) => r.importe);
     const ccaa = [...ccaaMap.entries()]
@@ -96,6 +99,7 @@ export default function App() {
 
     return {
       totalImporte, totalContratos, totalAdj, amN, amImporte, revN, revImporte,
+      adjudicados, sinAdjN, sinAdjImporte,
       ccaa, maxCcaa, ccaaPC, maxCcaaPC, serie, maxSerie, ranking, maxRank,
       contratos: filt(marts.contratos, 12),
       anomalias: filt(marts.anomalias, 12),
@@ -237,6 +241,13 @@ export default function App() {
                 <p className="meta" style={{ marginTop: "var(--sp-3)" }}>
                   Composición: incluye {num(view.amN)} acuerdos marco ({eur(view.amImporte)} — son techos, no gasto)
                   {view.revN > 0 && <> · {num(view.revN)} a verificar ({eur(view.revImporte)})</>}. Nada se excluye del total.
+                </p>
+              )}
+              {view.sinAdjN > 0 && (
+                <p className="meta" style={{ marginTop: "var(--sp-2)" }}>
+                  Trazabilidad por entidad: {num(view.sinAdjN)} adjudicaciones
+                  ({((view.sinAdjN / Math.max(1, view.adjudicados)) * 100).toFixed(1).replace(".", ",")} %, {eur(view.sinAdjImporte)} sin contar errores)
+                  no tienen un adjudicatario con NIF válido; cuentan en los totales pero quedan fuera de los rankings por entidad.
                 </p>
               )}
             </section>

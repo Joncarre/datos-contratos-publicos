@@ -137,7 +137,9 @@ _MARTS: dict[str, str] = {
                round(sum(importe) FILTER (WHERE es_acuerdo_marco), 2) AS importe_acuerdo_marco,
                count(*) FILTER (WHERE es_anulada)               AS n_anuladas,
                count(*) FILTER (WHERE revisar_importe)          AS n_revisar,
-               round(sum(importe) FILTER (WHERE revisar_importe), 2)  AS importe_revisar
+               round(sum(importe) FILTER (WHERE revisar_importe), 2)  AS importe_revisar,
+               count(*) FILTER (WHERE adj_id IS NULL AND status_rank >= 5) AS n_sin_adj,
+               round(sum(importe) FILTER (WHERE adj_id IS NULL AND status_rank >= 5 AND NOT revisar_importe), 2) AS importe_sin_adj
         FROM contratos GROUP BY source ORDER BY importe DESC NULLS LAST
     """,
     # Igual que `resumen` pero EXACTO para cada uno de los 3 periodos fijos (rangos anidados que
@@ -159,7 +161,9 @@ _MARTS: dict[str, str] = {
                round(sum(c.importe) FILTER (WHERE c.es_acuerdo_marco), 2) AS importe_acuerdo_marco,
                count(*) FILTER (WHERE c.es_anulada)               AS n_anuladas,
                count(*) FILTER (WHERE c.revisar_importe)          AS n_revisar,
-               round(sum(c.importe) FILTER (WHERE c.revisar_importe), 2)  AS importe_revisar
+               round(sum(c.importe) FILTER (WHERE c.revisar_importe), 2)  AS importe_revisar,
+               count(*) FILTER (WHERE c.adj_id IS NULL AND c.status_rank >= 5) AS n_sin_adj,
+               round(sum(c.importe) FILTER (WHERE c.adj_id IS NULL AND c.status_rank >= 5 AND NOT c.revisar_importe), 2) AS importe_sin_adj
         FROM contratos c JOIN periodos p ON c.year >= p.desde AND c.year <= 2026
         GROUP BY p.periodo, c.source ORDER BY p.periodo, importe DESC NULLS LAST
     """,

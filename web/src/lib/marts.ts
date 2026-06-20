@@ -19,6 +19,8 @@ export interface ResumenRow {
   n_anuladas: number;
   n_revisar: number;
   importe_revisar: number | null;
+  n_sin_adj: number;
+  importe_sin_adj: number | null;
 }
 export interface ResumenPeriodoRow extends ResumenRow { periodo: string; }
 export interface SerieRow { year: number; source: Source; contratos: number; importe: number | null; }
