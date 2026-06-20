@@ -65,12 +65,11 @@ export function SpainMap({
               d={path(f as never) ?? ""}
               className={`ccaa${hover === ccaa ? " hov" : ""}`}
               style={{ fill: v != null ? `var(--seq-${bucket(v)})` : "var(--surface-2)" }}
+              data-tip={`${ccaa}: ${v != null ? format(v) : "sin dato"}`}
               onMouseEnter={() => setHover(ccaa)}
               onMouseLeave={() => setHover(null)}
               onClick={() => onSelect?.(ccaa)}
-            >
-              <title>{ccaa}{v != null ? `: ${format(v)}` : ""}</title>
-            </path>
+            />
           );
         })}
         <path d={borders} className="mapborder" />

@@ -10,6 +10,7 @@ import {
   type Source,
 } from "./lib/marts";
 import { SpainMap } from "./SpainMap";
+import { TooltipLayer } from "./Tooltip";
 
 const Investigar = lazy(() => import("./Investigar"));
 
@@ -148,8 +149,11 @@ export default function App() {
     <div className="app">
       <header className="header">
         <div className="brand">
-          <span>CONTRATACIÓN<span className="dot">·</span>ES</span>
-          <span className="sub">registro de contratación pública · 2012+</span>
+          <span className="seal" aria-hidden>§</span>
+          <span className="btext">
+            <span className="bname">CONTRATACIÓN<span className="dot">·</span>ES</span>
+            <span className="sub">registro de contratación pública · 2012+</span>
+          </span>
         </div>
         <form
           className="search"
@@ -286,7 +290,7 @@ export default function App() {
                 {view.serie.map((s) => (
                   <div className="col" key={s.year}
                     style={{ height: `${Math.max(3, (s.importe / view.maxSerie) * 100)}%` }}
-                    title={`${s.year}: ${eur(s.importe)}`} />
+                    data-tip={`${s.year}: ${eur(s.importe)}`} />
                 ))}
               </div>
               <div className="meta" style={{ marginTop: "var(--sp-2)" }}>
@@ -319,7 +323,7 @@ export default function App() {
                       onClick={() => investigarCcaa(c.nombre)}
                       tabIndex={0}
                       onKeyDown={(e) => e.key === "Enter" && investigarCcaa(c.nombre)}
-                      title={`Investigar contratos de ${c.nombre}`}
+                      data-tip={`Investigar contratos de ${c.nombre}`}
                     >
                       <span className="r-idx">{i + 1}</span>
                       <span className="r-name">{c.nombre}</span>
@@ -346,7 +350,7 @@ export default function App() {
                 {view.ranking.map((r, i) => (
                   <div className="rank-row" key={r.nombre + i}>
                     <span className="idx">{i + 1}</span>
-                    <span className="name" title={r.nombre}>{r.nombre}</span>
+                    <span className="name" data-tip={r.nombre}>{r.nombre}</span>
                     <span className="amount">{eur(r.importe)}</span>
                     <div className="bar" style={{ width: `${(r.importe / view.maxRank) * 100}%` }} />
                   </div>
@@ -362,7 +366,7 @@ export default function App() {
                   <div className="big-row" key={(c.organo_id ?? "") + i}>
                     <span className="amount">HHI {c.hhi.toFixed(2)}</span>
                     <span className="tags"><span className="tag tag-rev">{c.pct_dominante}%</span></span>
-                    <span className="name" title={c.organo_nombre ?? ""}>
+                    <span className="name" data-tip={c.organo_nombre ?? ""}>
                       {c.organo_nombre}
                       <span className="muted"> → {c.top_proveedor} · {c.n_contratos} contr, {c.n_adjudicatarios} prov</span>
                     </span>
@@ -378,7 +382,7 @@ export default function App() {
                   <div className="big-row" key={(p.id ?? "") + i}>
                     <span className="amount">{eur(p.importe)}</span>
                     <span className="tags"><span className="tag tag-am">{num(p.n_organos)} órganos · {p.pct_top_organo}% de 1</span></span>
-                    <span className="name" title={p.top_organo ?? ""}>
+                    <span className="name" data-tip={p.top_organo ?? ""}>
                       {p.nombre}<span className="muted"> · {num(p.n_contratos)} contratos</span>
                     </span>
                   </div>
@@ -400,7 +404,7 @@ export default function App() {
                       {c.es_acuerdo_marco && <span className="tag tag-am">acuerdo marco</span>}
                       {c.revisar_importe && <span className="tag tag-rev">a verificar</span>}
                     </span>
-                    <span className="name" title={c.objeto ?? ""}>{c.adjudicatario_nombre || c.organo_nombre || c.objeto || "—"}</span>
+                    <span className="name" data-tip={c.objeto ?? ""}>{c.adjudicatario_nombre || c.organo_nombre || c.objeto || "—"}</span>
                     {c.link_detalle && <a className="ext" href={c.link_detalle} target="_blank" rel="noreferrer" title="Ver en PLACSP">↗</a>}
                   </div>
                 ))}
@@ -417,7 +421,7 @@ export default function App() {
                       <span className="tag tag-rev">×{a.score} σ</span>
                       {a.es_acuerdo_marco && <span className="tag tag-am">acuerdo marco</span>}
                     </span>
-                    <span className="name" title={a.objeto ?? ""}>
+                    <span className="name" data-tip={a.objeto ?? ""}>
                       {a.adjudicatario_nombre || a.organo_nombre || a.objeto || "—"}
                       <span className="muted"> · mediana similares {eur(a.importe_mediano_peer)} ({num(a.peers)} pares)</span>
                     </span>
@@ -434,7 +438,7 @@ export default function App() {
                   <div className="big-row" key={(f.organo_id ?? "") + (f.adj_key ?? "") + i}>
                     <span className="amount">{f.n_cerca_umbral}×</span>
                     <span className="tags"><span className="tag tag-rev">cerca umbral</span></span>
-                    <span className="name" title={f.organo_nombre ?? ""}>
+                    <span className="name" data-tip={f.organo_nombre ?? ""}>
                       {f.organo_nombre} → {f.adjudicatario_nombre}
                       <span className="muted"> · {eur(f.importe_cerca)} de {num(f.n_menores_total)} menores</span>
                     </span>
@@ -555,6 +559,7 @@ export default function App() {
         <span>·</span>
         <span>Fase 2 — análisis sobre 2012–2026</span>
       </footer>
+      <TooltipLayer />
     </div>
   );
 }

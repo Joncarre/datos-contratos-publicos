@@ -97,6 +97,7 @@ button {
   padding: var(--sp-3) var(--sp-4);
   background: var(--surface);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 6px 20px -14px rgba(14, 14, 12, 0.25);
   position: sticky;
   top: 0;
   z-index: 30;
@@ -117,11 +118,34 @@ button {
 
 .brand {
   display: flex;
-  align-items: baseline;
-  gap: var(--sp-2);
+  align-items: center;
+  gap: var(--sp-3);
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+.brand .seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 7px;
+  background: linear-gradient(160deg, #2a5ae0, var(--accent));
+  color: #fff;
+  font-size: var(--fs-16);
+  line-height: 1;
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.brand .btext {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.15;
+}
+.brand .bname {
+  font-size: var(--fs-16);
 }
 .brand .dot {
   color: var(--accent);
@@ -130,6 +154,7 @@ button {
   color: var(--ink-3);
   font-weight: 500;
   font-size: var(--fs-12);
+  letter-spacing: 0;
 }
 
 .search {
@@ -266,11 +291,22 @@ button.kbd:hover {
 }
 .rail h2,
 .context h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
   font-size: var(--fs-12);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--ink-3);
-  margin-bottom: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+.rail h2::before,
+.context h2::before {
+  content: "";
+  width: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
 }
 .filter-group {
   margin-bottom: var(--sp-6);
@@ -287,12 +323,18 @@ button.kbd:hover {
   padding: var(--sp-1) var(--sp-3);
   font-size: var(--fs-13);
   color: var(--ink-2);
-  transition: all var(--dur) var(--ease);
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 .chip[aria-pressed="true"] {
   border-color: var(--accent);
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
 /* ── Canvas (visualizaciones) ────────────────────────────────────────────── */
@@ -607,44 +649,102 @@ button.kbd:hover {
 .ext:hover { color: var(--accent); }
 .muted { color: var(--ink-3); }
 
+/* Tooltip premium (reemplaza el cuadro negro nativo). Sigue al cursor; data-tip en cualquier nodo. */
+.tip {
+  position: fixed;
+  z-index: 80;
+  pointer-events: none;
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  font-size: var(--fs-12);
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+.tip-k {
+  color: var(--ink-3);
+}
+.tip-v {
+  font-weight: 600;
+  color: var(--ink);
+}
+
 .search input::placeholder { color: var(--ink-4); }
 
 /* Índice del expediente (navegación de secciones) — la firma del producto */
 .index {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-1);
   margin-bottom: var(--sp-6);
 }
 .folio {
+  position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: 26px minmax(0, 1fr);
   gap: var(--sp-3);
-  align-items: baseline;
+  align-items: center;
   text-align: left;
-  padding: var(--sp-2);
+  padding: var(--sp-3);
   border: 0;
   background: transparent;
   border-radius: var(--radius-sm);
-  border-left: 2px solid transparent;
-  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  transition: background var(--dur) var(--ease);
+}
+/* Espina de acento que crece al activarse (la "pestaña" del dossier). */
+.folio::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 50%;
+  height: 0;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+  transform: translateY(-50%);
+  transition: height var(--dur) var(--ease);
 }
 .folio:hover {
   background: var(--surface-2);
 }
+.folio:hover .num {
+  border-color: var(--border-strong);
+  color: var(--ink-2);
+}
 .folio[aria-current="page"] {
-  background: var(--surface-2);
-  border-left-color: var(--accent);
+  background: var(--accent-soft);
+}
+.folio[aria-current="page"]::before {
+  height: 62%;
 }
 .folio .num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
   font-family: var(--font-display);
   font-size: var(--fs-12);
-  color: var(--ink-4);
+  color: var(--ink-3);
   font-variant-numeric: tabular-nums;
-  padding-top: 2px;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
 }
 .folio[aria-current="page"] .num {
-  color: var(--accent);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
 }
 .folio .lbl {
   display: flex;
@@ -657,6 +757,7 @@ button.kbd:hover {
 .folio .lbl .t {
   font-weight: 600;
   color: var(--ink-2);
+  line-height: 1.25;
 }
 .folio[aria-current="page"] .lbl .t {
   color: var(--ink);
@@ -664,6 +765,7 @@ button.kbd:hover {
 .folio .lbl .s {
   font-size: var(--fs-12);
   color: var(--ink-3);
+  line-height: 1.3;
 }
 
 /* Cabecera de sección en el lienzo (location indicator) */
