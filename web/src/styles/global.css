@@ -424,9 +424,17 @@ button.kbd:hover {
   grid-template-columns: 1.6em minmax(0, 1fr) auto;
   gap: var(--sp-2);
   align-items: baseline;
-  padding: var(--sp-2) 0;
+  padding: var(--sp-2);
   border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.07));
   font-size: var(--fs-13);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background var(--dur) var(--ease);
+}
+.ccaa-rank li:hover,
+.ccaa-rank li:focus-visible {
+  background: var(--surface-2);
+  outline: none;
 }
 .ccaa-rank .r-idx {
   color: var(--ink-3);

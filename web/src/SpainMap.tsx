@@ -15,9 +15,11 @@ const H = 440;
 export function SpainMap({
   data,
   format,
+  onSelect,
 }: {
   data: Map<string, number>;
   format: (n: number) => string;
+  onSelect?: (ccaa: string) => void;
 }) {
   const [hover, setHover] = useState<string | null>(null);
 
@@ -48,10 +50,8 @@ export function SpainMap({
     v > 0 ? Math.min(6, Math.max(1, 1 + Math.floor(((Math.log(v) - lmin) / lspan) * 5.999))) : 1;
 
   const caption = hover
-    ? data.has(hover)
-      ? `${hover} · ${format(data.get(hover)!)}`
-      : `${hover} · sin dato`
-    : "Pasa el ratón por una comunidad";
+    ? `${hover} · ${data.has(hover) ? format(data.get(hover)!) : "sin dato"} · clic para investigar`
+    : "Pasa el ratón por una comunidad · clic para investigarla";
 
   return (
     <div className="spainmap">
@@ -67,6 +67,7 @@ export function SpainMap({
               style={{ fill: v != null ? `var(--seq-${bucket(v)})` : "var(--surface-2)" }}
               onMouseEnter={() => setHover(ccaa)}
               onMouseLeave={() => setHover(null)}
+              onClick={() => onSelect?.(ccaa)}
             >
               <title>{ccaa}{v != null ? `: ${format(v)}` : ""}</title>
             </path>

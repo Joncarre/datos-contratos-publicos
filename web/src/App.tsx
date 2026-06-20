@@ -35,7 +35,11 @@ export default function App() {
   const [section, setSection] = useState<SectionId>("resumen");
   const [territorioMode, setTerritorioMode] = useState<"total" | "percapita">("total");
   const [q, setQ] = useState("");
-  const [seed, setSeed] = useState<{ text: string; nonce: number } | null>(null);
+  const [seed, setSeed] = useState<{ text: string; field?: string; nonce: number } | null>(null);
+  const investigarCcaa = (ccaa: string) => {
+    setSection("investigar");
+    setSeed({ text: ccaa, field: "ccaa", nonce: Date.now() });
+  };
 
   useEffect(() => {
     loadMarts().then(setMarts).catch((e) => setError(String(e.message ?? e)));
@@ -268,12 +272,18 @@ export default function App() {
                 </div>
               </div>
               <div className="territorio-grid">
-                <SpainMap data={mapData} format={fmt} />
+                <SpainMap data={mapData} format={fmt} onSelect={investigarCcaa} />
                 <ol className="ccaa-rank">
                   {arr.slice(0, 12).map((c, i) => (
-                    <li key={c.nombre}>
+                    <li
+                      key={c.nombre}
+                      onClick={() => investigarCcaa(c.nombre)}
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === "Enter" && investigarCcaa(c.nombre)}
+                      title={`Investigar contratos de ${c.nombre}`}
+                    >
                       <span className="r-idx">{i + 1}</span>
-                      <span className="r-name" title={c.nombre}>{c.nombre}</span>
+                      <span className="r-name">{c.nombre}</span>
                       <span className="r-val">{fmt(c.importe)}</span>
                     </li>
                   ))}

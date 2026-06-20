@@ -57,7 +57,7 @@ function buildWhere(f: Filters): string {
   return c.length ? "WHERE " + c.join(" AND ") : "";
 }
 
-type Seed = { text: string; nonce: number };
+type Seed = { text: string; field?: string; nonce: number };
 
 export default function Investigar({ seed }: { seed?: Seed | null }) {
   const [ready, setReady] = useState(false);
@@ -78,9 +78,15 @@ export default function Investigar({ seed }: { seed?: Seed | null }) {
   useEffect(() => {
     if (!seed?.text) return;
     const t = seed.text.trim();
-    const compact = t.replace(/[\s.-]/g, "");
-    const isNif = /^[A-Za-z]?\d{7,8}[A-Za-z]?$/.test(compact);
-    const nf: Filters = { ...emptyFilters, [isNif ? "nif" : "adjudicatario"]: isNif ? compact.toUpperCase() : t };
+    let nf: Filters;
+    if (seed.field && seed.field in emptyFilters) {
+      // Campo explícito (p. ej. clic en una CCAA del mapa → filtro ccaa).
+      nf = { ...emptyFilters, [seed.field]: t };
+    } else {
+      const compact = t.replace(/[\s.-]/g, "");
+      const isNif = /^[A-Za-z]?\d{7,8}[A-Za-z]?$/.test(compact);
+      nf = { ...emptyFilters, [isNif ? "nif" : "adjudicatario"]: isNif ? compact.toUpperCase() : t };
+    }
     setFilters(nf);
     setPending(nf);
     // eslint-disable-next-line react-hooks/exhaustive-deps
